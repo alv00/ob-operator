@@ -5,7 +5,6 @@ import (
 	"github.com/oceanbase/ob-operator/pkg/controllers/observer/cable"
 	observerconst "github.com/oceanbase/ob-operator/pkg/controllers/observer/const"
 	"github.com/oceanbase/ob-operator/pkg/controllers/observer/core/converter"
-	"github.com/oceanbase/ob-operator/pkg/controllers/observer/sql"
 	"k8s.io/klog/v2"
 )
 
@@ -26,7 +25,7 @@ func (ctrl *OBClusterCtrl) OBAgentBootstrapReady(statefulApp cloudv1.StatefulApp
 		klog.Infoln("try to get obagent", subsets[0].Pods[0].PodIP)
 		klog.Infoln("try to get obagent", subsets[0].Pods[1].PodIP)
 
-		obAgentList := sql.GetOBAgent(subsets[0].Pods[0].PodIP)
+		//obAgentList := sql.GetOBAgent(subsets[0].Pods[0].PodIP)
 
 		obAgentBootstrapSucceed := converter.IsAllOBAgentActive(statefulApp, ctrl.OBCluster.Spec.Topology)
 		if obAgentBootstrapSucceed {
