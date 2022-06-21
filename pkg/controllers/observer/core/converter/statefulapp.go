@@ -39,7 +39,7 @@ func GenerateStatefulAppBootStrapZoneSpec(zone []cloudv1.Subset) []cloudv1.Subse
 	return res
 }
 
-func GeneratePodSpec(obClusterSpec cloudv1.OBClusterSpec) corev1.PodSpec {
+func GenerateObContainer(obClusterSpec cloudv1.OBClusterSpec) corev1.Container {
 	port := make([]corev1.ContainerPort, 0)
 	cablePort := corev1.ContainerPort{}
 	cablePort.Name = observerconst.CablePortName
@@ -88,7 +88,6 @@ func GeneratePodSpec(obClusterSpec cloudv1.OBClusterSpec) corev1.PodSpec {
 	readinessProbe := corev1.Probe{}
 	readinessProbe.Handler.HTTPGet = &readinessProbeHTTP
 	readinessProbe.PeriodSeconds = observerconst.CableReadinessPeriod
-
 	container := corev1.Container{
 		Name:            observerconst.ImgOb,
 		Image:           fmt.Sprintf("%s:%s", obClusterSpec.ImageRepo, obClusterSpec.Tag),
@@ -98,7 +97,60 @@ func GeneratePodSpec(obClusterSpec cloudv1.OBClusterSpec) corev1.PodSpec {
 		VolumeMounts:    volumeMounts,
 		ReadinessProbe:  &readinessProbe,
 	}
+	return container
+}
+
+func GenerateObagentContainer(obClusterSpec cloudv1.OBClusterSpec) corev1.Container {
+
+	port := make([]corev1.ContainerPort, 0)
+	monagentPort := corev1.ContainerPort{}
+	monagentPort.Name = observerconst.MonagentPortName
+	monagentPort.ContainerPort = observerconst.MonagentPort
+	monagentPort.Protocol = corev1.ProtocolTCP
+	port = append(port, monagentPort)
+
+	requestsResources := corev1.ResourceList{}
+	requestsResources["cpu"] = obClusterSpec.Resources.CPU
+	requestsResources["memory"] = obClusterSpec.Resources.Memory
+	limitResources := corev1.ResourceList{}
+	limitResources["cpu"] = obClusterSpec.Resources.CPU
+	limitResources["memory"] = obClusterSpec.Resources.Memory
+	resources := corev1.ResourceRequirements{
+		Requests: requestsResources,
+		Limits:   limitResources,
+	}
+
+	volumeMountLog := corev1.VolumeMount{}
+	volumeMountLog.Name = observerconst.LogStorageName
+	volumeMountLog.MountPath = observerconst.LogStoragePath
+	volumeMounts := make([]corev1.VolumeMount, 0)
+	volumeMounts = append(volumeMounts, volumeMountLog)
+
+	readinessProbeHTTP := corev1.HTTPGetAction{}
+	readinessProbeHTTP.Port = intstr.FromInt(observerconst.MonagentPort)
+	readinessProbeHTTP.Path = observerconst.MonagentConfigUrl
+	readinessProbe := corev1.Probe{}
+	readinessProbe.Handler.HTTPGet = &readinessProbeHTTP
+	readinessProbe.PeriodSeconds = observerconst.MonagentConfigPeriod
+	container := corev1.Container{
+		Name:            observerconst.ImgObagent,
+		Image:           obClusterSpec.ImageObagent,
+		ImagePullPolicy: observerconst.ImgPullPolicy,
+		Ports:           port,
+		Resources:       resources,
+		VolumeMounts:    volumeMounts,
+		ReadinessProbe:  &readinessProbe,
+	}
+	return container
+}
+
+func GeneratePodSpec(obClusterSpec cloudv1.OBClusterSpec) corev1.PodSpec {
+
+	container := GenerateObContainer(obClusterSpec)
 	containers := make([]corev1.Container, 0)
+	containers = append(containers, container)
+
+	container = GenerateObagentContainer(obClusterSpec)
 	containers = append(containers, container)
 
 	volumeDataFile := corev1.Volume{}

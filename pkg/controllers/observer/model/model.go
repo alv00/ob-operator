@@ -37,3 +37,9 @@ type RSJobStatus struct {
 	ReturnCode int64
 	Progress   int64
 }
+
+type OBAgent struct {
+	ID     string
+	Status string
+	Zone   string
+}

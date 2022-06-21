@@ -43,6 +43,7 @@ sed -i "s/{host_ip}/${host_ip}/g" ./conf/config_properties/monagent_pipeline.yam
 sed -i "s/{cluster_name}/${cluster_name}/g" ./conf/config_properties/monagent_pipeline.yaml
 sed -i "s/{cluster_id}/${cluster_id}/g" ./conf/config_properties/monagent_pipeline.yaml
 sed -i "s/{zone_name}/${zone_name}/g" ./conf/config_properties/monagent_pipeline.yaml
+
 sed -i "s/{ob_monitor_status}/${ob_monitor_status}/g" ./conf/config_properties/monagent_pipeline.yaml
 sed -i "s/{ob_log_monitor_status}/${ob_log_monitor_status}/g" ./conf/config_properties/monagent_pipeline.yaml
 sed -i "s/{host_monitor_status}/${host_monitor_status}/g" ./conf/config_properties/monagent_pipeline.yaml

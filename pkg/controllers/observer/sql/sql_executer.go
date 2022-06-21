@@ -52,6 +52,24 @@ func GetOBServerFromDB(ip, port, db, SQL string) []model.AllServer {
 	return res
 }
 
+func GetOBAgentFromDB(ip, port, db, SQL string) []model.OBAgent {
+	client := ConnOB(ip, port, db, 5)
+	res := make([]model.OBAgent, 0)
+	if client != nil {
+		defer client.Close()
+		rows, err := client.Model(&model.OBAgent{}).Raw(SQL).Rows()
+		defer rows.Close()
+		var rowData model.OBAgent
+		for rows.Next() {
+			err = client.ScanRows(rows, &rowData)
+			if err == nil {
+				res = append(res, rowData)
+			}
+		}
+	}
+	return res
+}
+
 func GetRootServiceFromDB(ip, port, db, SQL string) []model.AllVirtualCoreMeta {
 	client := ConnOB(ip, port, db, 5)
 	res := make([]model.AllVirtualCoreMeta, 0)

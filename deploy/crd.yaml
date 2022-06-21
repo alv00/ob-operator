@@ -109,6 +109,7 @@ spec:
             required:
             - clusterID
             - imageRepo
+            - imageObagent
             - resources
             - tag
             - topology

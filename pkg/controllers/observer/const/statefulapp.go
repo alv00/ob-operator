@@ -15,6 +15,7 @@ package observerconst
 // StatefulApp
 const (
 	ImgOb         = "observer"
+	ImgObagent    = "obagent"
 	ImgPullPolicy = "IfNotPresent"
 
 	DatafileStorageName = "data-file"
@@ -25,4 +26,7 @@ const (
 	LogStoragePath      = "/home/admin/log"
 
 	CableReadinessPeriod = 2
+
+	// monagent
+	MonagentConfigPeriod = 2
 )
