@@ -50,3 +50,13 @@ func (ctrl *OBClusterCtrl) GetServiceClusterIPByName(namespace, name string) (st
 	}
 	return svc.(corev1.Service).Spec.ClusterIP, nil
 }
+
+func (ctrl *OBClusterCtrl) GetPodIPByName(namespace, name string) (string, error) {
+	svcName := converter.GenerateServiceName(name)
+	podExecuter := resource.NewPodResource(ctrl.Resource)
+	pod, err := podExecuter.Get(context.TODO(), namespace, svcName)
+	if err != nil {
+		return "", err
+	}
+	return pod.(corev1.PodIP).IP, nil
+}

@@ -156,8 +156,8 @@ func (ctrl *OBClusterCtrl) TopologyPrepareingEffector(statefulApp cloudv1.Statef
 				// OBCluster bootstrap succeeded
 				err = ctrl.OBClusterReadyForStep(observerconst.StepBootstrap, statefulApp)
 				if err == nil {
-					err = ctrl.CreateUserForObproxy()
-					err = ctrl.CreateUserForObagent()
+					err = ctrl.CreateUserForObproxy(statefulApp)
+					err = ctrl.CreateUserForObagent(statefulApp)
 				}
 			case observerconst.OBAgentReady:
 				err = ctrl.OBAgentBootstrapReady(statefulApp)

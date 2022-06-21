@@ -14,6 +14,7 @@ package core
 
 import (
 	"github.com/gin-gonic/gin"
+	cloudv1 "github.com/oceanbase/ob-operator/apis/cloud/v1"
 	"github.com/oceanbase/ob-operator/pkg/controllers/observer/sql"
 	"io/ioutil"
 	"k8s.io/klog/v2"
@@ -26,16 +27,15 @@ const (
 	TraceIdKey       = "traceId"
 )
 
-func (ctrl *OBClusterCtrl) CreateUserForObagent() error {
-	clusterIP, err := ctrl.GetServiceClusterIPByName(ctrl.OBCluster.Namespace, ctrl.OBCluster.Name)
+func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp) error {
+	subsets := statefulApp.Status.Subsets
+	podIp := subsets[0].Pods[0].PodIP
+
+	err := sql.CreateUser(podIp, "ocp-monitor", "root")
 	if err != nil {
 		return err
 	}
-	err = sql.CreateUser(clusterIP, "ocp-monitor", "root")
-	if err != nil {
-		return err
-	}
-	err = sql.GrantPrivilege(clusterIP, "select", "*.*", "ocp-monitor")
+	err = sql.GrantPrivilege(podIp, "select", "*.*", "ocp-monitor")
 	if err != nil {
 		return err
 	}
