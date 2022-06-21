@@ -30,11 +30,11 @@ const (
 func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp) error {
 	subsets := statefulApp.Status.Subsets
 	podIp := subsets[0].Pods[0].PodIP
-	err := sql.CreateUser(podIp, "ocp-monitor", "root")
+	err := sql.CreateUser(podIp, "ocp_monitor", "root")
 	if err != nil {
 		return err
 	}
-	err = sql.GrantPrivilege(podIp, "select", "*.*", "ocp-monitor")
+	err = sql.GrantPrivilege(podIp, "select", "*.*", "ocp_monitor")
 	if err != nil {
 		return err
 	}
