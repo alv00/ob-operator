@@ -1,20 +1,23 @@
 package converter
 
 import (
+	"fmt"
 	cloudv1 "github.com/oceanbase/ob-operator/apis/cloud/v1"
 	myconfig "github.com/oceanbase/ob-operator/pkg/config"
-	"github.com/oceanbase/ob-operator/pkg/controllers/observer/model"
+	observerconst "github.com/oceanbase/ob-operator/pkg/controllers/observer/const"
 	"io/ioutil"
 	"k8s.io/klog/v2"
 	"net/http"
 )
 
-func IsAllOBAgentActive(obAgentList []model.OBAgent, obClusters []cloudv1.Cluster) bool {
+func IsAllOBAgentActive(statefulApp cloudv1.StatefulApp, obClusters []cloudv1.Cluster) bool {
 	obAgentCurrentReplicas := make(map[string]bool)
-	for _, obAgent := range obAgentList {
-
-		if CheckObAgentActive(obAgent) {
-			obAgentCurrentReplicas[obAgent.Zone] = true
+	subsets := statefulApp.Status.Subsets
+	podIps := subsets[0].Pods[0].PodIP
+	for podIp := range podIps {
+		if CheckObAgentActive(podIp) {
+			//to do
+			obAgentCurrentReplicas["zone1"] = true
 		}
 	}
 	for _, obCluster := range obClusters {
@@ -31,9 +34,10 @@ func IsAllOBAgentActive(obAgentList []model.OBAgent, obClusters []cloudv1.Cluste
 	return false
 }
 
-func CheckObAgentActive(obAgent model.OBAgent) bool {
+func CheckObAgentActive(podIp int) bool {
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", "http://127.1:8088/metrics/ob/basic", nil)
+	checkUrl := fmt.Sprintf("http://%s:%d%s", podIp, observerconst.MonagentPort, observerconst.MonagentReadinessUrl)
+	req, err := http.NewRequest("GET", checkUrl, nil)
 	if err != nil {
 		klog.Errorln("check obAgent active: get new request", err)
 		return false

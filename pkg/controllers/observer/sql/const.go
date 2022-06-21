@@ -31,6 +31,4 @@ const (
 	CreateUserSQLTemplate = "CREATE USER ${USER} identified by '${PASSWORD}';"
 
 	GrantPrivilegeSQLTemplate = "GRANT ${PRIVILEGE} on ${OBJECT} to ${USER};"
-
-	GetOBAgentSQL = ""
 )

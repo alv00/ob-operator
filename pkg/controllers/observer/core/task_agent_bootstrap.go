@@ -28,7 +28,7 @@ func (ctrl *OBClusterCtrl) OBAgentBootstrapReady(statefulApp cloudv1.StatefulApp
 
 		obAgentList := sql.GetOBAgent(subsets[0].Pods[0].PodIP)
 
-		obAgentBootstrapSucceed := converter.IsAllOBAgentActive(obAgentList, ctrl.OBCluster.Spec.Topology)
+		obAgentBootstrapSucceed := converter.IsAllOBAgentActive(statefulApp, ctrl.OBCluster.Spec.Topology)
 		if obAgentBootstrapSucceed {
 			// update OBServer Pod Readiness
 			err = cable.CableReadinessUpdate(subsets)

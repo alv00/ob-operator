@@ -47,10 +47,6 @@ func BootstrapForOB(IP, SQL string) {
 	}
 }
 
-func GetOBAgent(IP string) []model.OBAgent {
-	return GetOBAgentFromDB(IP, ob.OBAGENT_MYSQL_PORT, DatabaseOb, GetOBAgentSQL)
-}
-
 func GetOBServer(IP string) []model.AllServer {
 	return GetOBServerFromDB(IP, ob.OBSERVER_MYSQL_PORT, DatabaseOb, GetOBServerSQL)
 }

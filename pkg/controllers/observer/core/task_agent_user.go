@@ -13,6 +13,7 @@ See the Mulan PSL v2 for more details.
 package core
 
 import (
+	"fmt"
 	cloudv1 "github.com/oceanbase/ob-operator/apis/cloud/v1"
 	observerconst "github.com/oceanbase/ob-operator/pkg/controllers/observer/const"
 	"github.com/oceanbase/ob-operator/pkg/controllers/observer/sql"
@@ -45,7 +46,8 @@ func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp)
 func (ctrl *OBClusterCtrl) ReviseConfig(podIp string) {
 	client := &http.Client{}
 	var data = strings.NewReader(SetConfig())
-	updateUrl := "http://" + podIp + observerconst.MonagentUpdateUrl
+
+	updateUrl := fmt.Sprintf("https://%s:%d%s", podIp, observerconst.MonagentPort, observerconst.MonagentUpdateUrl)
 	req, err := http.NewRequest("POST", updateUrl, data)
 	if err != nil {
 		klog.Errorln("ger new request", err)
