@@ -128,7 +128,7 @@ func GenerateObagentContainer(obClusterSpec cloudv1.OBClusterSpec) corev1.Contai
 
 	readinessProbeHTTP := corev1.HTTPGetAction{}
 	readinessProbeHTTP.Port = intstr.FromInt(observerconst.MonagentPort)
-	readinessProbeHTTP.Path = observerconst.MonagentConfigUrl
+	readinessProbeHTTP.Path = observerconst.MonagentReadinessUrl
 	readinessProbe := corev1.Probe{}
 	readinessProbe.Handler.HTTPGet = &readinessProbeHTTP
 	readinessProbe.PeriodSeconds = observerconst.MonagentConfigPeriod

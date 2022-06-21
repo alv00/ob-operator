@@ -13,8 +13,8 @@ See the Mulan PSL v2 for more details.
 package core
 
 import (
-	"github.com/gin-gonic/gin"
 	cloudv1 "github.com/oceanbase/ob-operator/apis/cloud/v1"
+	observerconst "github.com/oceanbase/ob-operator/pkg/controllers/observer/const"
 	"github.com/oceanbase/ob-operator/pkg/controllers/observer/sql"
 	"io/ioutil"
 	"k8s.io/klog/v2"
@@ -30,7 +30,6 @@ const (
 func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp) error {
 	subsets := statefulApp.Status.Subsets
 	podIp := subsets[0].Pods[0].PodIP
-
 	err := sql.CreateUser(podIp, "ocp-monitor", "root")
 	if err != nil {
 		return err
@@ -39,13 +38,15 @@ func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp)
 	if err != nil {
 		return err
 	}
+	ctrl.ReviseConfig(podIp)
 	return nil
 }
 
-func (ctrl *OBClusterCtrl) ReviseConfig(r *gin.Engine) {
+func (ctrl *OBClusterCtrl) ReviseConfig(podIp string) {
 	client := &http.Client{}
 	var data = strings.NewReader(SetConfig())
-	req, err := http.NewRequest("POST", "http://127.1:8088/api/v1/module/config/update", data)
+	updateUrl := "http://" + podIp + observerconst.MonagentUpdateUrl
+	req, err := http.NewRequest("POST", updateUrl, data)
 	if err != nil {
 		klog.Errorln("ger new request", err)
 	}
