@@ -65,7 +65,7 @@ func (ctrl *OBClusterCtrl) ReviseConfig(pod cloudv1.PodStatus) error {
 	config := ConfigsJson{
 		[]Configs{
 			{Key: "monagent.ob.monitor.user", Value: "ocp_monitor"},
-			{Key: "monagent.ob.monitor.password", Value: ""},
+			{Key: "monagent.ob.monitor.password", Value: "root"},
 			{Key: "monagent.host.ip", Value: pod.PodIP},
 			{Key: "monagent.ob.cluster.name", Value: "ob-test"},
 			{Key: "monagent.ob.cluster.id", Value: "1"},

@@ -19,7 +19,6 @@ func (ctrl *OBClusterCtrl) OBAgentBootstrapReady(statefulApp cloudv1.StatefulApp
 		subsets := statefulApp.Status.Subsets
 
 		//obAgentList := sql.GetOBAgent(subsets[0].Pods[0].PodIP)
-
 		obAgentBootstrapSucceed := converter.IsAllOBAgentActive(statefulApp)
 		for {
 			if obAgentBootstrapSucceed {
