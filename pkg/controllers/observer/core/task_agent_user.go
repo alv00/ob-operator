@@ -34,17 +34,35 @@ type Configs struct {
 
 func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp) error {
 	subsets := statefulApp.Status.Subsets
-	// 获得所有的 obagent
+    podIp := subsets[0].Pods[0].PodIP
+    err := sql.CreateUser(podIp, "ocp_monitor", "root")
+    klog.Errorln("CreateUser podIP is :", podIp)
+    if err != nil {
+        return err
+    }
+    err = sql.GrantPrivilege(podIp, "select", "*", "ocp_monitor")
+    if err != nil {
+        return err
+    }
+
+
+
+
+
+    // 获得所有的 obagent
 	for subsetsIdx, _ := range subsets {
 		for _, pod := range subsets[subsetsIdx].Pods {
-			err := sql.CreateUser(pod.PodIP, "ocp_monitor", "")
-			if err != nil {
-				return err
-			}
-			err = sql.GrantPrivilege(pod.PodIP, "select", "*.*", "ocp_monitor")
-			if err != nil {
-				return err
-			}
+	//		err := sql.CreateUser(pod.PodIP, "ocp_monitor", "")
+    //        klog.Infoln("obagent createuser pod ip", pod.PodIP)
+	//		if err != nil {
+    //            klog.Errorln("creater user for agent failed," ,err)
+	//			return err
+	//		}
+	//		err = sql.GrantPrivilege(pod.PodIP, "select", "*.*", "ocp_monitor")
+	//		if err != nil {
+    //            klog.Errorln("grant privilege for agent failed," ,err)
+	//			return err
+	//		}
 			ctrl.ReviseConfig(pod)
 		}
 	}
@@ -86,13 +104,9 @@ func (ctrl *OBClusterCtrl) ReviseConfig(pod cloudv1.PodStatus) {
 	}
 }
 
-//curl -X POST                                                                          -X/--request |指定什么命令|
-//-H 'content-type:application/json'													-H/--header 自定义头信息传递给服务器
-//-d '{"configs":[{"key":"monagent.pipeline.ob.status", "value":"active"}]}'            -d/--data HTTP POST方式传送数据
-//-L 'http://127.1:8088/api/v1/module/config/update
 
 func SetConfig() string {
-	config := `{"configs":[ 
+	config := `{"configs":[
 							{"key":"monagent.ob.monitor.user", "value":"ocp_monitor"},
 							{"key":"monagent.ob.monitor.password", "value":"root"},
 							{"key":"monagent.host.ip", "value":"10.42.0.178"},

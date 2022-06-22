@@ -33,6 +33,8 @@ spec:
               clusterID:
                 minimum: 1
                 type: integer
+              imageObagent:
+                type: string
               imageRepo:
                 type: string
               resources:
@@ -108,8 +110,8 @@ spec:
                 type: array
             required:
             - clusterID
-            - imageRepo
             - imageObagent
+            - imageRepo
             - resources
             - tag
             - topology
