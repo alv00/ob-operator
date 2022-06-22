@@ -37,7 +37,7 @@ func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp)
 	// 获得所有的 obagent
 	for subsetsIdx, _ := range subsets {
 		for _, pod := range subsets[subsetsIdx].Pods {
-			err := sql.CreateUser(pod.PodIP, "ocp_monitor", "root")
+			err := sql.CreateUser(pod.PodIP, "ocp_monitor", "")
 			if err != nil {
 				return err
 			}
@@ -56,7 +56,7 @@ func (ctrl *OBClusterCtrl) ReviseConfig(pod cloudv1.PodStatus) {
 	config := ConfigsJson{
 		[]Configs{
 			{Key: "monagent.ob.monitor.user", Value: "ocp_monitor"},
-			{Key: "monagent.ob.monitor.password", Value: "root"},
+			{Key: "monagent.ob.monitor.password", Value: ""},
 			{Key: "monagent.host.ip", Value: pod.PodIP},
 			{Key: "monagent.ob.cluster.name", Value: "ob-test"},
 			{Key: "monagent.ob.cluster.id", Value: "1"},
@@ -71,7 +71,7 @@ func (ctrl *OBClusterCtrl) ReviseConfig(pod cloudv1.PodStatus) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == http.StatusCreated {
+	if resp.StatusCode == http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			//Failed to read response.
