@@ -38,9 +38,7 @@ func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp)
 	klog.Infoln("try to get obagent", subsets)
 	klog.Infoln("try to get obagent", subsets[0])
 	klog.Infoln("try to get obagent", subsets[0].Pods[0])
-	klog.Infoln("try to get obagent", subsets[0].Pods[1])
 	klog.Infoln("try to get obagent", subsets[0].Pods[0].PodIP)
-	klog.Infoln("try to get obagent", subsets[0].Pods[1].PodIP)
 	podIp := subsets[0].Pods[0].PodIP
 
 	err := sql.CreateUser(podIp, "ocp_monitor", "root")
