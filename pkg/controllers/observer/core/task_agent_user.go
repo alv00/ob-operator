@@ -60,8 +60,8 @@ func (ctrl *OBClusterCtrl) ReviseConfig(podIp string) {
 		[]Configs{
 			{Key: "monagent.ob.monitor.user", Value: "ocp_monitor"},
 			{Key: "monagent.ob.monitor.password", Value: "root"},
-			{Key: "monagent.host.ip", Value: "10.42.0.178111"},
-			{Key: "monagent.ob.cluster.name", Value: "ob-test1111"},
+			{Key: "monagent.host.ip", Value: podIp},
+			{Key: "monagent.ob.cluster.name", Value: "ob-test"},
 			{Key: "monagent.ob.cluster.id", Value: "1"},
 			{Key: "monagent.ob.zone.name", Value: "zone1"}}}
 
