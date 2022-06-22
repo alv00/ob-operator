@@ -47,7 +47,7 @@ func (ctrl *OBClusterCtrl) ReviseConfig(podIp string) {
 	client := &http.Client{}
 	var data = strings.NewReader(SetConfig())
 
-	updateUrl := fmt.Sprintf("https://%s:%d%s", podIp, observerconst.MonagentPort, observerconst.MonagentUpdateUrl)
+	updateUrl := fmt.Sprintf("http://%s:%d%s", podIp, observerconst.MonagentPort, observerconst.MonagentUpdateUrl)
 	req, err := http.NewRequest("POST", updateUrl, data)
 	if err != nil {
 		klog.Errorln("ger new request", err)
