@@ -24,18 +24,12 @@ import (
 	"net/http"
 )
 
-const (
-	AgentResponseKey = "agentResponse"
-	TraceIdKey       = "traceId"
-)
-
-type Config struct {
-	User        string `json:"user"`
-	Password    string `json:"password"`
-	HostIp      string `json:"hostIp"`
-	ClusterName string `json:"clusterName"`
-	ClusterId   string `json:"clusterId"`
-	ZoneName    string `json:"zoneName"`
+type ConfigsJson struct {
+	Configs []Configs `json:"configs"`
+}
+type Configs struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp) error {
@@ -62,14 +56,14 @@ func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp)
 }
 
 func (ctrl *OBClusterCtrl) ReviseConfig(podIp string) {
-	config := Config{
-		User:        "ocp_monitor",
-		Password:    "root",
-		HostIp:      podIp,
-		ClusterName: "ob-test",
-		ClusterId:   "1",
-		ZoneName:    "zone1",
-	}
+	config := ConfigsJson{
+		[]Configs{
+			{Key: "monagent.ob.monitor.user", Value: "ocp_monitor"},
+			{Key: "monagent.ob.monitor.password", Value: "root"},
+			{Key: "monagent.host.ip", Value: "10.42.0.178111"},
+			{Key: "monagent.ob.cluster.name", Value: "ob-test1111"},
+			{Key: "monagent.ob.cluster.id", Value: "1"},
+			{Key: "monagent.ob.zone.name", Value: "zone1"}}}
 
 	updateUrl := fmt.Sprintf("http://%s:%d%s", podIp, observerconst.MonagentPort, observerconst.MonagentUpdateUrl)
 	body, _ := json.Marshal(config)
@@ -93,4 +87,21 @@ func (ctrl *OBClusterCtrl) ReviseConfig(podIp string) {
 		//The status is not Created. print the error.
 		klog.Errorln("Get failed with error: ", resp.Status)
 	}
+}
+
+//curl -X POST                                                                          -X/--request |指定什么命令|
+//-H 'content-type:application/json'													-H/--header 自定义头信息传递给服务器
+//-d '{"configs":[{"key":"monagent.pipeline.ob.status", "value":"active"}]}'            -d/--data HTTP POST方式传送数据
+//-L 'http://127.1:8088/api/v1/module/config/update
+
+func SetConfig() string {
+	config := `{"configs":[ 
+							{"key":"monagent.ob.monitor.user", "value":"ocp_monitor"},
+							{"key":"monagent.ob.monitor.password", "value":"root"},
+							{"key":"monagent.host.ip", "value":"10.42.0.178"},
+							{"key":"monagent.ob.cluster.name", "value":"ob-test"},
+							{"key":"monagent.ob.cluster.id", "value":"1"},
+							{"key":"monagent.ob.zone.name", "value":"zone1"}
+				]}`
+	return config
 }
