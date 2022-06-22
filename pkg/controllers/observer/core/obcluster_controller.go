@@ -131,6 +131,7 @@ func (ctrl *OBClusterCtrl) OBClusterEffector(statefulApp cloudv1.StatefulApp) er
 
 func (ctrl *OBClusterCtrl) TopologyPrepareingEffector(statefulApp cloudv1.StatefulApp) error {
 	var err error
+
 	for _, clusterStatus := range ctrl.OBCluster.Status.Topology {
 		if clusterStatus.Cluster == myconfig.ClusterName {
 			switch clusterStatus.ClusterStatus {

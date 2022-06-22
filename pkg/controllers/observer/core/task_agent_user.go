@@ -35,35 +35,34 @@ type Configs struct {
 func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp) error {
 	subsets := statefulApp.Status.Subsets
 	// 获得所有的 obagent
-	klog.Infoln("try to get obagent", subsets)
-	klog.Infoln("try to get obagent", subsets[0])
-	klog.Infoln("try to get obagent", subsets[0].Pods[0])
-	klog.Infoln("try to get obagent", subsets[0].Pods[0].PodIP)
-	podIp := subsets[0].Pods[0].PodIP
+	for subsetsIdx, _ := range subsets {
+		for _, pod := range subsets[subsetsIdx].Pods {
+			err := sql.CreateUser(pod.PodIP, "ocp_monitor", "root")
+			if err != nil {
+				return err
+			}
+			err = sql.GrantPrivilege(pod.PodIP, "select", "*.*", "ocp_monitor")
+			if err != nil {
+				return err
+			}
+			ctrl.ReviseConfig(pod)
+		}
+	}
 
-	err := sql.CreateUser(podIp, "ocp_monitor", "root")
-	if err != nil {
-		return err
-	}
-	err = sql.GrantPrivilege(podIp, "select", "*.*", "ocp_monitor")
-	if err != nil {
-		return err
-	}
-	ctrl.ReviseConfig(podIp)
 	return nil
 }
 
-func (ctrl *OBClusterCtrl) ReviseConfig(podIp string) {
+func (ctrl *OBClusterCtrl) ReviseConfig(pod cloudv1.PodStatus) {
 	config := ConfigsJson{
 		[]Configs{
 			{Key: "monagent.ob.monitor.user", Value: "ocp_monitor"},
 			{Key: "monagent.ob.monitor.password", Value: "root"},
-			{Key: "monagent.host.ip", Value: podIp},
+			{Key: "monagent.host.ip", Value: pod.PodIP},
 			{Key: "monagent.ob.cluster.name", Value: "ob-test"},
 			{Key: "monagent.ob.cluster.id", Value: "1"},
 			{Key: "monagent.ob.zone.name", Value: "zone1"}}}
 
-	updateUrl := fmt.Sprintf("http://%s:%d%s", podIp, observerconst.MonagentPort, observerconst.MonagentUpdateUrl)
+	updateUrl := fmt.Sprintf("http://%s:%d%s", pod.PodIP, observerconst.MonagentPort, observerconst.MonagentUpdateUrl)
 	body, _ := json.Marshal(config)
 	resp, err := http.Post(updateUrl, "application/json", bytes.NewBuffer(body))
 
