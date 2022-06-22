@@ -34,43 +34,34 @@ type Configs struct {
 
 func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp) error {
 	subsets := statefulApp.Status.Subsets
-    podIp := subsets[0].Pods[0].PodIP
-    err := sql.CreateUser(podIp, "ocp_monitor", "root")
-    klog.Errorln("CreateUser podIP is :", podIp)
-    if err != nil {
-        return err
-    }
-    err = sql.GrantPrivilege(podIp, "select", "*", "ocp_monitor")
-    if err != nil {
-        return err
-    }
-
-
-
-
-
-    // 获得所有的 obagent
-	for subsetsIdx, _ := range subsets {
-		for _, pod := range subsets[subsetsIdx].Pods {
-	//		err := sql.CreateUser(pod.PodIP, "ocp_monitor", "")
-    //        klog.Infoln("obagent createuser pod ip", pod.PodIP)
-	//		if err != nil {
-    //            klog.Errorln("creater user for agent failed," ,err)
-	//			return err
-	//		}
-	//		err = sql.GrantPrivilege(pod.PodIP, "select", "*.*", "ocp_monitor")
-	//		if err != nil {
-    //            klog.Errorln("grant privilege for agent failed," ,err)
-	//			return err
-	//		}
-			ctrl.ReviseConfig(pod)
-		}
+	podIp := subsets[0].Pods[0].PodIP
+	err := sql.CreateUser(podIp, "ocp_monitor", "root")
+	klog.Infoln("CreateUser podIP is :", podIp)
+	if err != nil {
+		return err
 	}
-
+	err = sql.GrantPrivilege(podIp, "select", "*", "ocp_monitor")
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func (ctrl *OBClusterCtrl) ReviseConfig(pod cloudv1.PodStatus) {
+func (ctrl *OBClusterCtrl) ReviseAllOBAgentConfig(statefulApp cloudv1.StatefulApp) error {
+	subsets := statefulApp.Status.Subsets
+	// 获得所有的 obagent
+	for subsetsIdx, _ := range subsets {
+		for _, pod := range subsets[subsetsIdx].Pods {
+			err := ctrl.ReviseConfig(pod)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (ctrl *OBClusterCtrl) ReviseConfig(pod cloudv1.PodStatus) error {
 	config := ConfigsJson{
 		[]Configs{
 			{Key: "monagent.ob.monitor.user", Value: "ocp_monitor"},
@@ -79,40 +70,25 @@ func (ctrl *OBClusterCtrl) ReviseConfig(pod cloudv1.PodStatus) {
 			{Key: "monagent.ob.cluster.name", Value: "ob-test"},
 			{Key: "monagent.ob.cluster.id", Value: "1"},
 			{Key: "monagent.ob.zone.name", Value: "zone1"}}}
-
 	updateUrl := fmt.Sprintf("http://%s:%d%s", pod.PodIP, observerconst.MonagentPort, observerconst.MonagentUpdateUrl)
 	body, _ := json.Marshal(config)
 	resp, err := http.Post(updateUrl, "application/json", bytes.NewBuffer(body))
-
 	if err != nil {
-		panic(err)
+		klog.Errorln("update obagent config failed,", pod.PodIP, err)
+		return err
 	}
 	defer resp.Body.Close()
-
 	if resp.StatusCode == http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			//Failed to read response.
-			panic(err)
 			klog.Errorln("Fail to read response:", err)
+			return err
 		}
 		jsonStr := string(body)
-		klog.Errorln("Update config Response: ", jsonStr)
+		klog.Infoln("Update config Response: ", jsonStr)
 	} else {
 		//The status is not Created. print the error.
 		klog.Errorln("Get failed with error: ", resp.Status)
 	}
-}
-
-
-func SetConfig() string {
-	config := `{"configs":[
-							{"key":"monagent.ob.monitor.user", "value":"ocp_monitor"},
-							{"key":"monagent.ob.monitor.password", "value":"root"},
-							{"key":"monagent.host.ip", "value":"10.42.0.178"},
-							{"key":"monagent.ob.cluster.name", "value":"ob-test"},
-							{"key":"monagent.ob.cluster.id", "value":"1"},
-							{"key":"monagent.ob.zone.name", "value":"zone1"}
-				]}`
-	return config
+	return nil
 }

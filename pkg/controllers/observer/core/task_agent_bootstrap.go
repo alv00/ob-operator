@@ -17,17 +17,17 @@ func (ctrl *OBClusterCtrl) OBAgentBootstrapReady(statefulApp cloudv1.StatefulApp
 
 	if !status {
 		subsets := statefulApp.Status.Subsets
-		// 获得所有的 obagent
-		klog.Infoln("try to get obagent", subsets)
-		klog.Infoln("try to get obagent", subsets[0])
-		klog.Infoln("try to get obagent", subsets[0].Pods[0])
-		klog.Infoln("try to get obagent", subsets[0].Pods[1])
-		klog.Infoln("try to get obagent", subsets[0].Pods[0].PodIP)
-		klog.Infoln("try to get obagent", subsets[0].Pods[1].PodIP)
 
 		//obAgentList := sql.GetOBAgent(subsets[0].Pods[0].PodIP)
 
-		obAgentBootstrapSucceed := converter.IsAllOBAgentActive(statefulApp, ctrl.OBCluster.Spec.Topology)
+		obAgentBootstrapSucceed := converter.IsAllOBAgentActive(statefulApp)
+		for {
+			if obAgentBootstrapSucceed {
+				break
+			}
+			obAgentBootstrapSucceed = converter.IsAllOBAgentActive(statefulApp)
+		}
+
 		if obAgentBootstrapSucceed {
 			// update OBServer Pod Readiness
 			err = cable.CableReadinessUpdate(subsets)

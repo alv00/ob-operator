@@ -3,38 +3,26 @@ package converter
 import (
 	"fmt"
 	cloudv1 "github.com/oceanbase/ob-operator/apis/cloud/v1"
-	myconfig "github.com/oceanbase/ob-operator/pkg/config"
 	observerconst "github.com/oceanbase/ob-operator/pkg/controllers/observer/const"
 	"io/ioutil"
 	"k8s.io/klog/v2"
 	"net/http"
 )
 
-func IsAllOBAgentActive(statefulApp cloudv1.StatefulApp, obClusters []cloudv1.Cluster) bool {
-	obAgentCurrentReplicas := make(map[string]bool)
+func IsAllOBAgentActive(statefulApp cloudv1.StatefulApp) bool {
+	readiness := true
 	subsets := statefulApp.Status.Subsets
-	podIps := subsets[0].Pods[0].PodIP
-	for podIp := range podIps {
-		if CheckObAgentActive(podIp) {
-			//to do
-			obAgentCurrentReplicas["zone1"] = true
-		}
-	}
-	for _, obCluster := range obClusters {
-		if obCluster.Cluster == myconfig.ClusterName {
-			for _, zone := range obCluster.Zone {
-				tmp := obAgentCurrentReplicas[zone.Name]
-				if !tmp {
-					return false
-				}
+	for subsetsIdx, _ := range subsets {
+		for _, pod := range subsets[subsetsIdx].Pods {
+			if !CheckObAgentActive(pod.PodIP) {
+				readiness = false
 			}
-			return true
 		}
 	}
-	return false
+	return readiness
 }
 
-func CheckObAgentActive(podIp int) bool {
+func CheckObAgentActive(podIp string) bool {
 	client := &http.Client{}
 	checkUrl := fmt.Sprintf("http://%s:%d%s", podIp, observerconst.MonagentPort, observerconst.MonagentReadinessUrl)
 	req, err := http.NewRequest("GET", checkUrl, nil)
