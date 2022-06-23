@@ -1,3 +1,16 @@
+FROM golang:1.16 as builder
+
+WORKDIR /workspace
+
+RUN echo '----------- DATE_CHANGE: Add this line to disable cache during docker building -------------------'
+
+RUN mkdir -p /home/admin/obagent/conf
+# Copy the Go Modules manifests
+RUN git clone https://github.com/oceanbase/obagent.git
+
+# Build
+RUN cd /workspace/obagent && make build-release
+
 FROM openanolis/anolisos:8.4-x86_64
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
@@ -8,12 +21,15 @@ ENV TINI_VERSION v0.19.0
 ADD ./tini /tini
 RUN chmod +x /tini
 
-
 RUN useradd -m admin
-ENV OBAGENT_VERSION 1.1.1
-ENV OBAGENT_RELEASE 2
 
-RUN rpm -ivh https://mirrors.aliyun.com/oceanbase/community/stable/el/8/x86_64/obagent-${OBAGENT_VERSION}-${OBAGENT_RELEASE}.el8.x86_64.rpm
+RUN mkdir -p /home/admin/obagent/bin
+RUN mkdir -p /home/admin/obagent/run
+RUN mkdir -p /home/admin/obagent/log
+
+COPY --from=builder /workspace/obagent/bin/monagent ./obagent/bin
+COPY --from=builder /workspace/obagent/etc ./obagent/conf
+
 RUN chown -R admin:admin /home/admin/obagent
 ADD ./replace_yaml.sh /home/admin/obagent
 
