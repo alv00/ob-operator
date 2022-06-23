@@ -120,6 +120,12 @@ func GenerateObagentContainer(obClusterSpec cloudv1.OBClusterSpec) corev1.Contai
 		Limits:   limitResources,
 	}
 
+	volumeMountDataFile := corev1.VolumeMount{}
+	volumeMountDataFile.Name = observerconst.DatafileStorageName
+	volumeMountDataFile.MountPath = observerconst.DatafileStoragePath
+	volumeMountDataLog := corev1.VolumeMount{}
+	volumeMountDataLog.Name = observerconst.DatalogStorageName
+	volumeMountDataLog.MountPath = observerconst.DatalogStoragePath
 	volumeMountLog := corev1.VolumeMount{}
 	volumeMountLog.Name = observerconst.LogStorageName
 	volumeMountLog.MountPath = observerconst.LogStoragePath
