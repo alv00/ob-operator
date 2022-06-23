@@ -162,9 +162,6 @@ func (ctrl *OBClusterCtrl) TopologyPrepareingEffector(statefulApp cloudv1.Statef
 					err = ctrl.ReviseAllOBAgentConfig(statefulApp)
 				}
 				klog.Infoln("preparation for obagent")
-			case observerconst.OBAgentReady:
-				klog.Infoln("case observerconst.OBAgentReady")
-				err = ctrl.OBAgentBootstrapReady(statefulApp)
 			}
 		}
 	}
