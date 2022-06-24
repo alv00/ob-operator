@@ -57,7 +57,7 @@ func GenerateServiceSpecForPrometheus(statefulAppName string) corev1.ServiceSpec
 	var servicePort corev1.ServicePort
 	servicePort.Name = observerconst.MonagentPortName
 	servicePort.Port = observerconst.MonagentPort
-	servicePort.TargetPort = intstr.FromInt(observerconst.MysqlPort)
+	servicePort.TargetPort = intstr.FromInt(observerconst.MonagentPort)
 	servicePort.Protocol = corev1.ProtocolTCP
 	ports = append(ports, servicePort)
 
