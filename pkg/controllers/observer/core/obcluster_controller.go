@@ -158,10 +158,10 @@ func (ctrl *OBClusterCtrl) TopologyPrepareingEffector(statefulApp cloudv1.Statef
 				err = ctrl.OBClusterReadyForStep(observerconst.StepBootstrap, statefulApp)
 				if err == nil {
 					err = ctrl.CreateUserForObproxy(statefulApp)
+					klog.Infoln("preparation for obagent")
 					err = ctrl.CreateUserForObagent(statefulApp)
 					err = ctrl.ReviseAllOBAgentConfig(statefulApp)
 				}
-				klog.Infoln("preparation for obagent")
 			}
 		}
 	}
