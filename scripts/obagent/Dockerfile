@@ -18,7 +18,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 WORKDIR /home/admin
 
 ENV TINI_VERSION v0.19.0
-ADD ./tini /tini
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
 RUN useradd -m admin

@@ -29,4 +29,6 @@ const (
 
 	// monagent
 	MonagentConfigPeriod = 2
+	ConfFileStorageName  = "obagent conf file"
+	ConfFileStoragePath  = "/home/admin/obagent/conf"
 )
