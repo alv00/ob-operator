@@ -102,12 +102,12 @@ func GenerateObContainer(obClusterSpec cloudv1.OBClusterSpec) corev1.Container {
 
 func GenerateObagentContainer(obClusterSpec cloudv1.OBClusterSpec) corev1.Container {
 
-	port := make([]corev1.ContainerPort, 0)
+	ports := make([]corev1.ContainerPort, 0)
 	monagentPort := corev1.ContainerPort{}
 	monagentPort.Name = observerconst.MonagentPortName
 	monagentPort.ContainerPort = observerconst.MonagentPort
 	monagentPort.Protocol = corev1.ProtocolTCP
-	port = append(port, monagentPort)
+	ports = append(ports, monagentPort)
 
 	requestsResources := corev1.ResourceList{}
 	requestsResources["cpu"] = obClusterSpec.Resources.CPU
@@ -120,17 +120,11 @@ func GenerateObagentContainer(obClusterSpec cloudv1.OBClusterSpec) corev1.Contai
 		Limits:   limitResources,
 	}
 
-	volumeMountDataFile := corev1.VolumeMount{}
-	volumeMountDataFile.Name = observerconst.DatafileStorageName
-	volumeMountDataFile.MountPath = observerconst.DatafileStoragePath
-	volumeMountDataLog := corev1.VolumeMount{}
-	volumeMountDataLog.Name = observerconst.DatalogStorageName
-	volumeMountDataLog.MountPath = observerconst.DatalogStoragePath
-	volumeMountLog := corev1.VolumeMount{}
-	volumeMountLog.Name = observerconst.LogStorageName
-	volumeMountLog.MountPath = observerconst.LogStoragePath
+	volumeMountConfFile := corev1.VolumeMount{}
+	volumeMountConfFile.Name = observerconst.ConfFileStorageName
+	volumeMountConfFile.MountPath = observerconst.ConfFileStoragePath
 	volumeMounts := make([]corev1.VolumeMount, 0)
-	volumeMounts = append(volumeMounts, volumeMountLog)
+	volumeMounts = append(volumeMounts, volumeMountConfFile)
 
 	readinessProbeHTTP := corev1.HTTPGetAction{}
 	readinessProbeHTTP.Port = intstr.FromInt(observerconst.MonagentPort)
@@ -142,7 +136,7 @@ func GenerateObagentContainer(obClusterSpec cloudv1.OBClusterSpec) corev1.Contai
 		Name:            observerconst.ImgObagent,
 		Image:           obClusterSpec.ImageObagent,
 		ImagePullPolicy: observerconst.ImgPullPolicy,
-		Ports:           port,
+		Ports:           ports,
 		Resources:       resources,
 		VolumeMounts:    volumeMounts,
 		ReadinessProbe:  &readinessProbe,
