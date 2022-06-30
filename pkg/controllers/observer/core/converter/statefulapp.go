@@ -171,10 +171,17 @@ func GeneratePodSpec(obClusterSpec cloudv1.OBClusterSpec) corev1.PodSpec {
 		ClaimName: observerconst.LogStorageName,
 	}
 	volumeLog.VolumeSource.PersistentVolumeClaim = volumeLogSource
+	volumeObagentConfFile := corev1.Volume{}
+	volumeObagentConfFile.Name = observerconst.ConfFileStorageName
+	volumeObagentConfFileSource := &corev1.PersistentVolumeClaimVolumeSource{
+		ClaimName: observerconst.ConfFileStoragePath,
+	}
+	volumeObagentConfFile.VolumeSource.PersistentVolumeClaim = volumeObagentConfFileSource
 	volumes := make([]corev1.Volume, 0)
 	volumes = append(volumes, volumeDataFile)
 	volumes = append(volumes, volumeDataLog)
 	volumes = append(volumes, volumeLog)
+	volumes = append(volumes, volumeObagentConfFile)
 
 	podSpec := corev1.PodSpec{
 		Containers: containers,
