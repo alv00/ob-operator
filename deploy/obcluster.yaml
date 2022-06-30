@@ -39,3 +39,6 @@ spec:
       - name: log
         storageClassName: "local-path"
         size: 30Gi
+      - name: obagent-conf-file
+        storageClassName: "local-path"
+        size: 50Gi

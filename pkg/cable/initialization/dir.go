@@ -49,6 +49,4 @@ func InitDir() {
 	cmd.Run()
 	cmd = exec.Command("chown", "-R", "admin:admin", "/home/admin/")
 	cmd.Run()
-	cmd = exec.Command("mkdir", "-p", "/home/admin/obagent/conf")
-	cmd.Run()
 }
