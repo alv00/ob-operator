@@ -121,8 +121,8 @@ func GenerateObagentContainer(obClusterSpec cloudv1.OBClusterSpec) corev1.Contai
 	}
 
 	volumeMountConfFile := corev1.VolumeMount{}
-	/*volumeMountConfFile.Name = observerconst.ConfFileStorageName
-	volumeMountConfFile.MountPath = observerconst.ConfFileStoragePath*/
+	volumeMountConfFile.Name = observerconst.ConfFileStorageName
+	volumeMountConfFile.MountPath = observerconst.ConfFileStoragePath
 	volumeMounts := make([]corev1.VolumeMount, 0)
 	volumeMounts = append(volumeMounts, volumeMountConfFile)
 
