@@ -174,7 +174,7 @@ func GeneratePodSpec(obClusterSpec cloudv1.OBClusterSpec) corev1.PodSpec {
 	volumeObagentConfFile := corev1.Volume{}
 	volumeObagentConfFile.Name = observerconst.ConfFileStorageName
 	volumeObagentConfFileSource := &corev1.PersistentVolumeClaimVolumeSource{
-		ClaimName: observerconst.ConfFileStoragePath,
+		ClaimName: observerconst.ConfFileStorageName,
 	}
 	volumeObagentConfFile.VolumeSource.PersistentVolumeClaim = volumeObagentConfFileSource
 	volumes := make([]corev1.Volume, 0)
