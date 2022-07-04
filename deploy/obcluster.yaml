@@ -6,7 +6,7 @@ metadata:
 spec:
   imageRepo: hongxinsun/oceanbase-cn
   tag: v3.1.3-10100042022051821
-  imageObagent: alv00/obagent:v0.4
+  imageObagent: alv00/obagent:v0.6
   clusterID: 1
   topology:
     - cluster: cn
@@ -15,16 +15,6 @@ spec:
         region: region1
         nodeSelector:
           topology.kubernetes.io/zone: zone1
-        replicas: 1
-      - name: zone2
-        region: region1
-        nodeSelector:
-          topology.kubernetes.io/zone: zone2
-        replicas: 1
-      - name: zone3
-        region: region1
-        nodeSelector:
-          topology.kubernetes.io/zone: zone3
         replicas: 1
   resources:
     cpu: 2

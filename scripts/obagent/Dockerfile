@@ -4,7 +4,6 @@ WORKDIR /workspace
 
 RUN echo '----------- DATE_CHANGE: Add this line to disable cache during docker building -------------------'
 
-RUN mkdir -p /home/admin/obagent/conf
 # Copy the Go Modules manifests
 RUN git clone https://github.com/oceanbase/obagent.git
 
@@ -26,12 +25,14 @@ RUN useradd -m admin
 RUN mkdir -p /home/admin/obagent/bin
 RUN mkdir -p /home/admin/obagent/run
 RUN mkdir -p /home/admin/obagent/log
+RUN mkdir -p /home/admin/obagent/conf
 
 COPY --from=builder /workspace/obagent/bin/monagent ./obagent/bin
-COPY --from=builder /workspace/obagent/etc ./obagent/conf
+COPY --from=builder /workspace/obagent/etc ./obagent/etc
 
 RUN chown -R admin:admin /home/admin/obagent
 ADD ./replace_yaml.sh /home/admin/obagent
 
+
 ENTRYPOINT ["/tini", "--"]
-CMD ["bash", "-c", " cd /home/admin/obagent && ./replace_yaml.sh  && ./bin/monagent -c conf/monagent.yaml"]
+CMD ["bash", "-c", " cd /home/admin/obagent && cp -r etc/* conf/ && ./replace_yaml.sh  && ./bin/monagent -c conf/monagent.yaml"]
