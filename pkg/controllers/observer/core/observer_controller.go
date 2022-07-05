@@ -81,12 +81,12 @@ func (ctrl *OBClusterCtrl) OBServerScaleUPByZone(statefulApp cloudv1.StatefulApp
 		if err != nil {
 			return err
 		}
-		/*		// revise obagent config
-				pod := statefulApp.Status.Subsets[0].Pods[0]
-				err = ctrl.ReviseConfig(pod)
-				if err != nil {
-					return err
-				}*/
+		// revise obagent config
+		pod := statefulApp.Status.Subsets[0].Pods[0]
+		err = ctrl.ReviseConfig(pod)
+		if err != nil {
+			return err
+		}
 		zoneStatus = observerconst.OBServerAdd
 		// update status
 		return ctrl.UpdateOBClusterAndZoneStatus(clusterStatus, zoneName, zoneStatus)
