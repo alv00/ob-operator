@@ -1,6 +1,6 @@
 VERSION := $(shell git rev-parse --short HEAD)
 # Image URL to use all building/pushing image targets
-IMG ?= alv00/ob-operator:0.83
+IMG ?= alv00/ob-operator:0.88
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false"
 
