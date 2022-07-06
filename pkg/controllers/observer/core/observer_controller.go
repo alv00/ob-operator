@@ -17,6 +17,7 @@ import (
 	observerconst "github.com/oceanbase/ob-operator/pkg/controllers/observer/const"
 	"github.com/oceanbase/ob-operator/pkg/controllers/observer/core/converter"
 	"github.com/oceanbase/ob-operator/pkg/controllers/observer/core/judge"
+	"k8s.io/klog/v2"
 )
 
 func (ctrl *OBClusterCtrl) OBServerCoordinator(statefulApp cloudv1.StatefulApp) error {
@@ -81,6 +82,9 @@ func (ctrl *OBClusterCtrl) OBServerScaleUPByZone(statefulApp cloudv1.StatefulApp
 		if err != nil {
 			return err
 		}
+		klog.Infoln("OBServerScaleUPByZone")
+		klog.Infoln("scale up revise config, statefulApp.Status.Subsets[0]", statefulApp.Status.Subsets[0])
+		klog.Infoln("scale up revise config, statefulApp.Status.Subsets[0].Pods[0]", statefulApp.Status.Subsets[0].Pods[0])
 		// revise obagent config
 		pod := statefulApp.Status.Subsets[0].Pods[0]
 		err = ctrl.ReviseConfig(pod)
@@ -138,7 +142,19 @@ func (ctrl *OBClusterCtrl) OBServerMaintain(statefulApp cloudv1.StatefulApp) err
 	// nil is need to add server
 	if err == nil {
 		// add server
-		return ctrl.AddOBServer(clusterIP, zoneName, podIP, statefulApp)
+		err = ctrl.AddOBServer(clusterIP, zoneName, podIP, statefulApp)
+		if err != nil {
+			return err
+		}
+		klog.Infoln("OBServerMaintain")
+		klog.Infoln("scale up revise config, statefulApp.Status.Subsets[0]", statefulApp.Status.Subsets[0])
+		klog.Infoln("scale up revise config, statefulApp.Status.Subsets[0].Pods[0]", statefulApp.Status.Subsets[0].Pods[0])
+		// revise obagent config
+		pod := statefulApp.Status.Subsets[0].Pods[0]
+		err = ctrl.ReviseConfig(pod)
+		if err != nil {
+			return err
+		}
 	}
 
 	// get info for del server
