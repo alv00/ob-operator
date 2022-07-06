@@ -15,7 +15,6 @@ package converter
 import (
 	"fmt"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/klog/v2"
 
@@ -111,11 +110,7 @@ func GenerateObagentContainer(obClusterSpec cloudv1.OBClusterSpec) corev1.Contai
 	ports = append(ports, monagentPort)
 
 	requestsResources := corev1.ResourceList{}
-	requestsResources["cpu"] = *resource.NewQuantity(1, resource.DecimalSI)
-	requestsResources["memory"] = *resource.NewQuantity(1*1024*1024*1024, resource.BinarySI)
 	limitResources := corev1.ResourceList{}
-	limitResources["cpu"] = *resource.NewQuantity(1, resource.DecimalSI)
-	limitResources["memory"] = *resource.NewQuantity(1*1024*1024*1024, resource.BinarySI)
 	resources := corev1.ResourceRequirements{
 		Requests: requestsResources,
 		Limits:   limitResources,
