@@ -82,11 +82,10 @@ func (ctrl *OBClusterCtrl) OBServerScaleUPByZone(statefulApp cloudv1.StatefulApp
 		if err != nil {
 			return err
 		}
-		klog.Infoln("OBServerScaleUPByZone")
-		klog.Infoln("scale up revise config, statefulApp.Status.Subsets[0]", statefulApp.Status.Subsets[0])
-		klog.Infoln("scale up revise config, statefulApp.Status.Subsets[0].Pods[0]", statefulApp.Status.Subsets[0].Pods[0])
+		klog.Infoln("-----------------------OBServerScaleUPByZone-----------------------")
 		// revise obagent config
 		pod := statefulApp.Status.Subsets[0].Pods[0]
+		klog.Infoln("pod: ", pod)
 		err = ctrl.ReviseConfig(pod)
 		if err != nil {
 			return err
@@ -146,11 +145,10 @@ func (ctrl *OBClusterCtrl) OBServerMaintain(statefulApp cloudv1.StatefulApp) err
 		if err != nil {
 			return err
 		}
-		klog.Infoln("OBServerMaintain")
-		klog.Infoln("scale up revise config, statefulApp.Status.Subsets[0]", statefulApp.Status.Subsets[0])
-		klog.Infoln("scale up revise config, statefulApp.Status.Subsets[0].Pods[0]", statefulApp.Status.Subsets[0].Pods[0])
+		klog.Infoln("-----------------------OBServerMaintain-----------------------")
 		// revise obagent config
 		pod := statefulApp.Status.Subsets[0].Pods[0]
+		klog.Infoln("pod: ", pod)
 		err = ctrl.ReviseConfig(pod)
 		if err != nil {
 			return err

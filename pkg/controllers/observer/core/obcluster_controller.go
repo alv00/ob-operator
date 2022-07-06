@@ -199,8 +199,6 @@ func (ctrl *OBClusterCtrl) TopologyReadyEffector(statefulApp cloudv1.StatefulApp
 
 	// check resource modified
 	resourcesIsModified, err := judge.ResourcesIsModified(ctrl.OBCluster.Spec.Topology, ctrl.OBCluster, statefulApp)
-	klog.Infoln("2 obClusterCtrl:", ctrl)
-	klog.Infoln(" ctrl.OBCluster", ctrl.OBCluster)
 	if err != nil {
 		return err
 	}
