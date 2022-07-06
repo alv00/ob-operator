@@ -18,8 +18,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"k8s.io/apimachinery/pkg/api/resource"
-
 	cloudv1 "github.com/oceanbase/ob-operator/apis/cloud/v1"
 	observerconst "github.com/oceanbase/ob-operator/pkg/controllers/observer/const"
 	observerutil "github.com/oceanbase/ob-operator/pkg/controllers/observer/core/util"
@@ -112,11 +110,11 @@ func GenerateObagentContainer(obClusterSpec cloudv1.OBClusterSpec) corev1.Contai
 	ports = append(ports, monagentPort)
 
 	requestsResources := corev1.ResourceList{}
-	requestsResources["cpu"] = *resource.NewQuantity(1, resource.DecimalSI)
-	requestsResources["memory"] = *resource.NewQuantity(1 * 1024 * 1024 * 1024, resource.BinarySI)
+	requestsResources["cpu"] = obClusterSpec.Resources.CPU
+	requestsResources["memory"] = obClusterSpec.Resources.Memory
 	limitResources := corev1.ResourceList{}
-	limitResources["cpu"] = *resource.NewQuantity(1, resource.DecimalSI)
-	limitResources["memory"] = *resource.NewQuantity(1 * 1024 * 1024 * 1024, resource.BinarySI)
+	limitResources["cpu"] = obClusterSpec.Resources.CPU
+	limitResources["memory"] = obClusterSpec.Resources.Memory
 	resources := corev1.ResourceRequirements{
 		Requests: requestsResources,
 		Limits:   limitResources,

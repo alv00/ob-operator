@@ -42,11 +42,11 @@ func ResourcesIsModified(clusterList []cloudv1.Cluster, obCluster cloudv1.OBClus
 	cluster := converter.GetClusterSpecFromOBTopology(clusterList)
 	statefulAppNew := converter.GenerateStatefulAppObject(cluster, obCluster)
 	podTemplateCompareStatus := reflect.DeepEqual(statefulApp.Spec.PodTemplate, statefulAppNew.Spec.PodTemplate)
-	klog.Info("statefulApp.Spec.PodTemplate {}", statefulApp.Spec.PodTemplate)
-	klog.Info("statefulAppNew.Spec.PodTemplate {}", statefulAppNew.Spec.PodTemplate)
+	klog.Info("statefulApp.Spec.PodTemplate ｜｜｜｜｜", statefulApp.Spec.PodTemplate)
+	klog.Info("statefulAppNew.Spec.PodTemplate ｜｜｜｜｜", statefulAppNew.Spec.PodTemplate)
 	storageTemplatesCompareStatus := reflect.DeepEqual(statefulApp.Spec.StorageTemplates, statefulAppNew.Spec.StorageTemplates)
-	klog.Info("statefulApp.Spec.StorageTemplates{}", statefulApp.Spec.StorageTemplates)
-	klog.Info("statefulAppNew.Spec.StorageTemplates {}", statefulAppNew.Spec.StorageTemplates)
+	klog.Info("statefulApp.Spec.StorageTemplates｜｜｜｜｜", statefulApp.Spec.StorageTemplates)
+	klog.Info("statefulAppNew.Spec.StorageTemplates ｜｜｜｜｜", statefulAppNew.Spec.StorageTemplates)
 	if podTemplateCompareStatus && storageTemplatesCompareStatus {
 		return false, nil
 	}
