@@ -142,9 +142,7 @@ func (ctrl *OBClusterCtrl) OBServerMaintain(statefulApp cloudv1.StatefulApp) err
 	if err == nil {
 		// add server
 		err = ctrl.AddOBServer(clusterIP, zoneName, podIP, statefulApp)
-		if err != nil {
-			return err
-		}
+		return err
 		klog.Infoln("-----------------------OBServerMaintain-----------------------")
 		// revise obagent config
 		/*pod := statefulApp.Status.Subsets[0].Pods[0]
