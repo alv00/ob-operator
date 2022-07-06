@@ -110,7 +110,11 @@ func GenerateObagentContainer(obClusterSpec cloudv1.OBClusterSpec) corev1.Contai
 	ports = append(ports, monagentPort)
 
 	requestsResources := corev1.ResourceList{}
+	requestsResources["cpu"] = obClusterSpec.Resources.CPU
+	requestsResources["memory"] = obClusterSpec.Resources.Memory
 	limitResources := corev1.ResourceList{}
+	limitResources["cpu"] = obClusterSpec.Resources.CPU
+	limitResources["memory"] = obClusterSpec.Resources.Memory
 	resources := corev1.ResourceRequirements{
 		Requests: requestsResources,
 		Limits:   limitResources,
