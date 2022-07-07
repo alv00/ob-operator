@@ -17,7 +17,6 @@ import (
 	observerconst "github.com/oceanbase/ob-operator/pkg/controllers/observer/const"
 	"github.com/oceanbase/ob-operator/pkg/controllers/observer/core/converter"
 	"github.com/oceanbase/ob-operator/pkg/controllers/observer/core/judge"
-	"github.com/oceanbase/ob-operator/pkg/controllers/observer/sql"
 	"k8s.io/klog/v2"
 )
 
@@ -85,9 +84,8 @@ func (ctrl *OBClusterCtrl) OBServerScaleUPByZone(statefulApp cloudv1.StatefulApp
 		}
 		klog.Infoln("-----------------------OBServerScaleUPByZone-----------------------")
 		// 确认observer的状态是否ready并且start_service_time>0
-		obServerList := sql.GetOBServer(clusterIP)
 		go func() {
-			err := ctrl.ReviseOBAgentConfig(podIP, obServerList)
+			err := ctrl.ReviseOBAgentConfig(podIP, clusterIP)
 			if err != nil {
 				klog.Errorln("OBServerScaleUPByZone : error revise obagent config (observer is active): ", err)
 			}
@@ -146,9 +144,8 @@ func (ctrl *OBClusterCtrl) OBServerMaintain(statefulApp cloudv1.StatefulApp) err
 		// add server
 		err = ctrl.AddOBServer(clusterIP, zoneName, podIP, statefulApp)
 		klog.Infoln("-----------------------OBServerMaintain-----------------------")
-		obServerList := sql.GetOBServer(clusterIP)
 		go func() {
-			err := ctrl.ReviseOBAgentConfig(podIP, obServerList)
+			err := ctrl.ReviseOBAgentConfig(podIP, clusterIP)
 			if err != nil {
 				klog.Errorln("OBServerMaintain : error revise obagent config (observer is active): ", err)
 			}

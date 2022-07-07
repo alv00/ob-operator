@@ -18,7 +18,6 @@ import (
 	"fmt"
 	cloudv1 "github.com/oceanbase/ob-operator/apis/cloud/v1"
 	observerconst "github.com/oceanbase/ob-operator/pkg/controllers/observer/const"
-	"github.com/oceanbase/ob-operator/pkg/controllers/observer/model"
 	"github.com/oceanbase/ob-operator/pkg/controllers/observer/sql"
 	"io/ioutil"
 	"k8s.io/klog/v2"
@@ -94,8 +93,9 @@ func (ctrl *OBClusterCtrl) ReviseConfig(podIP string) error {
 	return nil
 }
 
-func (ctrl *OBClusterCtrl) ReviseOBAgentConfig(podIP string, obServerList []model.AllServer) error {
+func (ctrl *OBClusterCtrl) ReviseOBAgentConfig(podIP string, clusterIP string) error {
 	for {
+		obServerList := sql.GetOBServer(clusterIP)
 		klog.Infoln("ReviseOBAgentConfig: obServerList", obServerList)
 		for _, obServer := range obServerList {
 			klog.Infoln("ReviseOBAgentConfig: obServer ", obServer.SvrIP)
@@ -104,9 +104,8 @@ func (ctrl *OBClusterCtrl) ReviseOBAgentConfig(podIP string, obServerList []mode
 				if obServer.Status == "active" && obServer.StartServiceTime > 0 {
 					return ctrl.ReviseConfig(podIP)
 				}
-			}
-			{
-				continue
+			} else {
+				break
 			}
 		}
 	}
