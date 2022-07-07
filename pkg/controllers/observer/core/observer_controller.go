@@ -83,14 +83,18 @@ func (ctrl *OBClusterCtrl) OBServerScaleUPByZone(statefulApp cloudv1.StatefulApp
 			return err
 		}
 		klog.Infoln("-----------------------OBServerScaleUPByZone-----------------------")
+
 		// revise obagent config
-		pod := statefulApp.Status.Subsets[0].Pods[1]
-		klog.Infoln("pod: ", pod)
-		klog.Infoln("statefulApp.Status.Subsets: ", statefulApp.Status.Subsets)
-		err = ctrl.ReviseConfig(pod)
-		if err != nil {
-			return err
+		subsets := statefulApp.Status.Subsets
+		for _, subset := range subsets {
+			for _, pod := range subset.Pods {
+				err = ctrl.ReviseConfig(pod)
+				if err != nil {
+					return err
+				}
+			}
 		}
+
 		zoneStatus = observerconst.OBServerAdd
 		// update status
 		return ctrl.UpdateOBClusterAndZoneStatus(clusterStatus, zoneName, zoneStatus)
@@ -145,13 +149,15 @@ func (ctrl *OBClusterCtrl) OBServerMaintain(statefulApp cloudv1.StatefulApp) err
 		err = ctrl.AddOBServer(clusterIP, zoneName, podIP, statefulApp)
 		return err
 		klog.Infoln("-----------------------OBServerMaintain-----------------------")
-		// revise obagent config
-		/*pod := statefulApp.Status.Subsets[0].Pods[0]
-		klog.Infoln("pod: ", pod)
-		err = ctrl.ReviseConfig(pod)
-		if err != nil {
-			return err
-		}*/
+		subsets := statefulApp.Status.Subsets
+		for _, subset := range subsets {
+			for _, pod := range subset.Pods {
+				err = ctrl.ReviseConfig(pod)
+				if err != nil {
+					return err
+				}
+			}
+		}
 	}
 
 	// get info for del server
