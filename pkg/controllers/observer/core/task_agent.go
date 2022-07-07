@@ -105,7 +105,7 @@ func (ctrl *OBClusterCtrl) ReviseOBAgentConfig(podIP string, clusterIP string) e
 					return ctrl.ReviseConfig(podIP)
 				}
 			} else {
-				break
+				continue
 			}
 		}
 	}
