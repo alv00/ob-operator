@@ -17,6 +17,7 @@ import (
 	observerconst "github.com/oceanbase/ob-operator/pkg/controllers/observer/const"
 	"github.com/oceanbase/ob-operator/pkg/controllers/observer/core/converter"
 	"github.com/oceanbase/ob-operator/pkg/controllers/observer/core/judge"
+	"github.com/oceanbase/ob-operator/pkg/controllers/observer/sql"
 	"k8s.io/klog/v2"
 )
 
@@ -83,17 +84,14 @@ func (ctrl *OBClusterCtrl) OBServerScaleUPByZone(statefulApp cloudv1.StatefulApp
 			return err
 		}
 		klog.Infoln("-----------------------OBServerScaleUPByZone-----------------------")
-
-		// revise obagent config
-		subsets := statefulApp.Status.Subsets
-		for _, subset := range subsets {
-			for _, pod := range subset.Pods {
-				err = ctrl.ReviseConfig(pod)
-				if err != nil {
-					return err
-				}
+		// 确认observer的状态是否ready并且start_service_time>0
+		obServerList := sql.GetOBServer(clusterIP)
+		go func() {
+			err := ctrl.ReviseOBAgentConfig(podIP, obServerList)
+			if err != nil {
+				klog.Errorln("OBServerScaleUPByZone : error revise obagent config (observer is active): ", err)
 			}
-		}
+		}()
 
 		zoneStatus = observerconst.OBServerAdd
 		// update status
@@ -147,17 +145,15 @@ func (ctrl *OBClusterCtrl) OBServerMaintain(statefulApp cloudv1.StatefulApp) err
 	if err == nil {
 		// add server
 		err = ctrl.AddOBServer(clusterIP, zoneName, podIP, statefulApp)
-		return err
 		klog.Infoln("-----------------------OBServerMaintain-----------------------")
-		subsets := statefulApp.Status.Subsets
-		for _, subset := range subsets {
-			for _, pod := range subset.Pods {
-				err = ctrl.ReviseConfig(pod)
-				if err != nil {
-					return err
-				}
+		obServerList := sql.GetOBServer(clusterIP)
+		go func() {
+			err := ctrl.ReviseOBAgentConfig(podIP, obServerList)
+			if err != nil {
+				klog.Errorln("OBServerMaintain : error revise obagent config (observer is active): ", err)
 			}
-		}
+		}()
+		return err
 	}
 
 	// get info for del server

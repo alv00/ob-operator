@@ -18,6 +18,7 @@ import (
 	"fmt"
 	cloudv1 "github.com/oceanbase/ob-operator/apis/cloud/v1"
 	observerconst "github.com/oceanbase/ob-operator/pkg/controllers/observer/const"
+	"github.com/oceanbase/ob-operator/pkg/controllers/observer/model"
 	"github.com/oceanbase/ob-operator/pkg/controllers/observer/sql"
 	"io/ioutil"
 	"k8s.io/klog/v2"
@@ -52,7 +53,7 @@ func (ctrl *OBClusterCtrl) ReviseAllOBAgentConfig(statefulApp cloudv1.StatefulAp
 	// 获得所有的 obagent
 	for subsetsIdx, _ := range subsets {
 		for _, pod := range subsets[subsetsIdx].Pods {
-			err := ctrl.ReviseConfig(pod)
+			err := ctrl.ReviseConfig(pod.PodIP)
 			if err != nil {
 				return err
 			}
@@ -61,20 +62,20 @@ func (ctrl *OBClusterCtrl) ReviseAllOBAgentConfig(statefulApp cloudv1.StatefulAp
 	return nil
 }
 
-func (ctrl *OBClusterCtrl) ReviseConfig(pod cloudv1.PodStatus) error {
+func (ctrl *OBClusterCtrl) ReviseConfig(podIP string) error {
 	config := ConfigsJson{
 		[]Configs{
 			{Key: "monagent.ob.monitor.user", Value: "ocp_monitor"},
 			{Key: "monagent.ob.monitor.password", Value: "root"},
-			{Key: "monagent.host.ip", Value: pod.PodIP},
+			{Key: "monagent.host.ip", Value: podIP},
 			{Key: "monagent.ob.cluster.name", Value: "ob-test"},
 			{Key: "monagent.ob.cluster.id", Value: "1"},
 			{Key: "monagent.ob.zone.name", Value: "zone1"}}}
-	updateUrl := fmt.Sprintf("http://%s:%d%s", pod.PodIP, observerconst.MonagentPort, observerconst.MonagentUpdateUrl)
+	updateUrl := fmt.Sprintf("http://%s:%d%s", podIP, observerconst.MonagentPort, observerconst.MonagentUpdateUrl)
 	body, _ := json.Marshal(config)
 	resp, err := http.Post(updateUrl, "application/json", bytes.NewBuffer(body))
 	if err != nil {
-		klog.Errorln("update obagent config failed,", pod.PodIP, err)
+		klog.Errorln("update obagent config failed,", podIP, err)
 		return err
 	}
 	defer resp.Body.Close()
@@ -91,4 +92,18 @@ func (ctrl *OBClusterCtrl) ReviseConfig(pod cloudv1.PodStatus) error {
 		klog.Errorln("Get failed with error: ", resp.Status)
 	}
 	return nil
+}
+
+func (ctrl *OBClusterCtrl) ReviseOBAgentConfig(podIP string, obServerList []model.AllServer) error {
+	for {
+		for _, obServer := range obServerList {
+			klog.Infoln("ReviseOBAgentConfig: obServer ", obServer.SvrIP)
+			if obServer.SvrIP == podIP {
+				klog.Infoln("ReviseOBAgentConfig status and startServiceTime: ", obServer.SvrIP, obServer.Status, obServer.StartServiceTime)
+				if obServer.Status == "active" && obServer.StartServiceTime > 0 {
+					return ctrl.ReviseConfig(podIP)
+				}
+			}
+		}
+	}
 }
