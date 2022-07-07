@@ -84,12 +84,13 @@ func (ctrl *OBClusterCtrl) OBServerScaleUPByZone(statefulApp cloudv1.StatefulApp
 		}
 		klog.Infoln("-----------------------OBServerScaleUPByZone-----------------------")
 		// revise obagent config
-		/*pod := statefulApp.Status.Subsets[0].Pods[0]
+		pod := statefulApp.Status.Subsets[0].Pods[0]
 		klog.Infoln("pod: ", pod)
+		klog.Infoln("statefulApp.Status.Subsets: ", statefulApp.Status.Subsets)
 		err = ctrl.ReviseConfig(pod)
 		if err != nil {
 			return err
-		}*/
+		}
 		zoneStatus = observerconst.OBServerAdd
 		// update status
 		return ctrl.UpdateOBClusterAndZoneStatus(clusterStatus, zoneName, zoneStatus)
