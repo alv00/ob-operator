@@ -14,6 +14,7 @@ package converter
 
 import (
 	"github.com/pkg/errors"
+	"k8s.io/klog/v2"
 
 	cloudv1 "github.com/oceanbase/ob-operator/apis/cloud/v1"
 	myconfig "github.com/oceanbase/ob-operator/pkg/config"
@@ -87,11 +88,15 @@ func GetInfoForAddServerByZone(clusterIP string, statefulApp cloudv1.StatefulApp
 
 	nodeMap := GenerateNodeMapByOBServerList(obServerList)
 
+	klog.Info("GetInfoForAddServerByZone: nodeMap", nodeMap)
 	// judge witch ip need add
 	for _, subset := range statefulApp.Status.Subsets {
+		klog.Infoln("GetInfoForAddServerByZone: subset ", subset)
 		for _, pod := range subset.Pods {
+			klog.Infoln("GetInfoForAddServerByZone: pod ", pod)
 			if pod.PodPhase == statefulappCore.PodStatusRunning {
 				status := IsPodNotInOBServerList(subset.Name, pod.PodIP, nodeMap)
+				klog.Infoln("GetInfoForAddServerByZone: status ", status)
 				// Pod IP not in OBServerList, need to add server
 				// do one thing at a time
 				if status {
