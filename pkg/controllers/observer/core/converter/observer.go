@@ -57,6 +57,8 @@ func IsOBServerDeleted(clusterIP, podIP string) bool {
 
 func IsPodNotInOBServerList(zoneName, ip string, nodeMap map[string][]cloudv1.OBNode) bool {
 	zoneIPList := nodeMap[zoneName]
+	klog.Infoln("zoneIPList : ", zoneIPList)
+	klog.Infoln("IP : ", ip)
 	if len(zoneIPList) > 0 {
 		for _, tmpIP := range zoneIPList {
 			if tmpIP.ServerIP == ip {
