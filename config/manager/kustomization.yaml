@@ -12,5 +12,5 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 images:
 - name: controller
-  newName: oceanbase/obce-operator
-  newTag: v1.0.1
+  newName: alv00/ob-operator
+  newTag: "0.89"
