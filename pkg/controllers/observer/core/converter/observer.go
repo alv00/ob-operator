@@ -74,6 +74,7 @@ func IsPodNotInOBServerList(zoneName, ip string, nodeMap map[string][]cloudv1.OB
 func IsOBServerInactiveOrDeletingAndNotInPodList(server cloudv1.OBNode, podRunningList []string) bool {
 	if server.Status == observerconst.OBServerInactive || server.Status == observerconst.OBServerDeleting {
 		for _, podIP := range podRunningList {
+			klog.Infoln("IsOBServerInactiveOrDeletingAndNotInPodList: podIP, server.ServerIP: ", podIP, server.ServerIP)
 			if podIP == server.ServerIP {
 				return false
 			}
@@ -120,10 +121,16 @@ func GetInfoForDelServerByZone(clusterIP string, clusterSpec cloudv1.Cluster, st
 
 	nodeMap := GenerateNodeMapByOBServerList(obServerList)
 
+	klog.Info("GetInfoForDelServerByZone: nodeMap", nodeMap)
 	// judge witch ip need del
 	for _, subset := range statefulApp.Status.Subsets {
+		klog.Infoln("GetInfoForDelServerByZone: subset ", subset)
 		runningPodList := getRunningPodListFromSubsetStatus(subset)
+		klog.Infoln("GetInfoForDelServerByZone: runningPodList ", runningPodList)
 		zoneSpec := GetZoneSpecFromClusterSpec(subset.Name, clusterSpec)
+		klog.Infoln("GetInfoForDelServerByZone: zoneSpec ", zoneSpec)
+		klog.Infoln("GetInfoForDelServerByZone: len(nodeMap[subset.Name]) ", len(nodeMap[subset.Name]))
+		klog.Infoln("GetInfoForDelServerByZone: int(zoneSpec.Replicas) ", int(zoneSpec.Replicas))
 		// number of observer in db > replica
 		if len(nodeMap[subset.Name]) > int(zoneSpec.Replicas) {
 			for _, pod := range nodeMap[subset.Name] {
