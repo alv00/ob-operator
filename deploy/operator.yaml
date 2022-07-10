@@ -396,7 +396,7 @@ spec:
         - --cluster-name=cn
         command:
         - /manager
-        image: alv00/ob-operator:0.9.0
+        image: alv00/ob-operator:0.9.1
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
