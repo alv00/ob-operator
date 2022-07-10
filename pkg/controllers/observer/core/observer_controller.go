@@ -85,6 +85,7 @@ func (ctrl *OBClusterCtrl) OBServerScaleUPByZone(statefulApp cloudv1.StatefulApp
 		klog.Infoln("-----------------------OBServerScaleUPByZone-----------------------")
 		// 确认observer的状态是否ready并且start_service_time>0
 		go func() {
+			// TODO ：确认 pod 是 running，
 			err := ctrl.ReviseOBAgentConfig(podIP, clusterIP)
 			if err != nil {
 				klog.Errorln("OBServerScaleUPByZone : error revise obagent config (observer is active): ", err)
