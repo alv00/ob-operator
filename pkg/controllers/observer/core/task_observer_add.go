@@ -132,7 +132,8 @@ func TickerOBServerStatusCheck(clusterName, podIP string) error {
 				return errors.New("observer starting timeout")
 			}
 			num = num + 1
-			err = cable.OBServerStatusCheckExecuter(clusterName, podIP)
+            // connect obcluster and check start_service_time > 0 and status = active
+			// err = cable.OBServerStatusCheckExecuter(clusterName, podIP)
 			if err == nil {
 				return err
 			}
