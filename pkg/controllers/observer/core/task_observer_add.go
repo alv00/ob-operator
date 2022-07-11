@@ -13,6 +13,8 @@ See the Mulan PSL v2 for more details.
 package core
 
 import (
+	"fmt"
+	"github.com/oceanbase/ob-operator/pkg/config/constant"
 	"time"
 
 	"github.com/pkg/errors"
@@ -91,7 +93,7 @@ func (ctrl *OBClusterCtrl) AddOBServerExecuter(clusterIP, zoneName, podIP string
 	// nil is OBServer is already running
 	if err != nil {
 		cable.OBServerStartExecuter(podIP, obServerStartArgs)
-		err = TickerOBServerStatusCheck(ctrl.OBCluster.Name, podIP)
+		err = TickerOBServerStatusCheck(podIP)
 		if err != nil {
 			// kill pod
 			_ = ctrl.DelPodFromStatefulAppByIP(zoneName, podIP, statefulApp)
@@ -121,10 +123,9 @@ func (ctrl *OBClusterCtrl) AddOBServerExecuter(clusterIP, zoneName, podIP string
 	_ = ctrl.UpdateOBClusterAndZoneStatus(observerconst.ClusterReady, zoneName, observerconst.OBZoneReady)
 }
 
-func TickerOBServerStatusCheck(clusterName, podIP string) error {
+func TickerOBServerStatusCheck(podIP string) error {
 	tick := time.Tick(observerconst.TickPeriodForOBServerStatusCheck)
 	var num int
-	var err error
 	for {
 		select {
 		case <-tick:
@@ -132,11 +133,16 @@ func TickerOBServerStatusCheck(clusterName, podIP string) error {
 				return errors.New("observer starting timeout")
 			}
 			num = num + 1
-            // connect obcluster and check start_service_time > 0 and status = active
-			// err = cable.OBServerStatusCheckExecuter(clusterName, podIP)
-			if err == nil {
-				return err
+			obServerList := sql.GetOBServer(podIP)
+			serverIP := fmt.Sprintf("%s:%d", podIP, constant.OBSERVER_RPC_PORT)
+			for _, obServer := range obServerList {
+				if obServer.SvrIP == serverIP {
+					if obServer.Status == observerconst.OBServerActive && obServer.StartServiceTime > 0 {
+						return nil
+					}
+				}
 			}
 		}
 	}
+
 }
