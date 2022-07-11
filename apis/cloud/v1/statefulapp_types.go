@@ -48,8 +48,8 @@ type StatefulAppStatus struct {
 type SubsetStatus struct {
 	Name              string      `json:"name"`
 	Region            string      `json:"region,omitempty"`
-	ExpectedReplicas  int32       `json:"expectedReplicas"`
-	AvailableReplicas int32       `json:"availableReplicas"`
+	ExpectedReplicas  int         `json:"expectedReplicas"`
+	AvailableReplicas int         `json:"availableReplicas"`
 	Pods              []PodStatus `json:"pods"`
 }
 
