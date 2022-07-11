@@ -136,6 +136,8 @@ func TickerOBServerStatusCheck(podIP string) error {
 			obServerList := sql.GetOBServer(podIP)
 			serverIP := fmt.Sprintf("%s:%d", podIP, constant.OBSERVER_RPC_PORT)
 			for _, obServer := range obServerList {
+				klog.Infoln("TickerOBServerStatusCheck: obServer.SvrIP", obServer.SvrIP)
+				klog.Infoln("TickerOBServerStatusCheck: serverIP", serverIP)
 				if obServer.SvrIP == serverIP {
 					if obServer.Status == observerconst.OBServerActive && obServer.StartServiceTime > 0 {
 						return nil
