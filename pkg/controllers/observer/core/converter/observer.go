@@ -126,7 +126,7 @@ func GetInfoForDelServerByZone(clusterIP string, clusterSpec cloudv1.Cluster, st
 	for _, subset := range statefulApp.Status.Subsets {
 		klog.Infoln("GetInfoForDelServerByZone: subset ", subset)
 		podListToDelete := getPodListToDeleteFromSubsetStatus(subset)
-		klog.Infoln("GetInfoForDelServerByZone: runningPodList ", podListToDelete)
+		klog.Infoln("GetInfoForDelServerByZone: podListToDelete ", podListToDelete)
 		zoneSpec := GetZoneSpecFromClusterSpec(subset.Name, clusterSpec)
 		klog.Infoln("GetInfoForDelServerByZone: zoneSpec ", zoneSpec)
 		klog.Infoln("GetInfoForDelServerByZone: len(nodeMap[subset.Name]) ", len(nodeMap[subset.Name]))
