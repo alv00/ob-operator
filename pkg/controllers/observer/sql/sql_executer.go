@@ -39,6 +39,7 @@ func GetOBServerFromDB(ip string, port int, db string, SQL string) []model.AllSe
 	if client != nil {
 		defer client.Close()
 		rows, err := client.Model(&model.AllServer{}).Raw(SQL).Rows()
+		klog.Errorln("GetOBServerFromDB: err - ", err)
 		if err == nil {
 			defer rows.Close()
 			var rowData model.AllServer

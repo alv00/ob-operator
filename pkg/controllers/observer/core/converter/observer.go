@@ -57,11 +57,11 @@ func IsOBServerDeleted(clusterIP, podIP string) bool {
 
 func IsPodNotInOBServerList(zoneName, ip string, nodeMap map[string][]cloudv1.OBNode) bool {
 	zoneIPList := nodeMap[zoneName]
-	klog.Infoln("zoneIPList : ", zoneIPList)
+	klog.Infoln("IsPodNotInOBServerList: zoneIPList ", zoneIPList)
 
 	if len(zoneIPList) > 0 {
 		for _, tmpIP := range zoneIPList {
-			klog.Infoln("IP : ", ip, tmpIP.ServerIP)
+			klog.Infoln("IsPodNotInOBServerList: IP and tmpIP.ServerIP ", ip, tmpIP.ServerIP)
 			if tmpIP.ServerIP == ip {
 				return false
 			}
@@ -130,9 +130,9 @@ func GetInfoForDelServerByZone(clusterIP string, clusterSpec cloudv1.Cluster, st
 		zoneSpec := GetZoneSpecFromClusterSpec(subset.Name, clusterSpec)
 		klog.Infoln("GetInfoForDelServerByZone: zoneSpec ", zoneSpec)
 		klog.Infoln("GetInfoForDelServerByZone: len(nodeMap[subset.Name]) ", len(nodeMap[subset.Name]))
-		klog.Infoln("GetInfoForDelServerByZone: int(zoneSpec.Replicas) ", int(zoneSpec.Replicas))
+		klog.Infoln("GetInfoForDelServerByZone: int(zoneSpec.Replicas) ", zoneSpec.Replicas)
 		// number of observer in db > replica
-		if len(nodeMap[subset.Name]) > int(zoneSpec.Replicas) {
+		if len(nodeMap[subset.Name]) > zoneSpec.Replicas {
 			for _, pod := range nodeMap[subset.Name] {
 				for _, podToDelete := range podListToDelete {
 					if pod.ServerIP == podToDelete {
