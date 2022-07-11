@@ -78,20 +78,11 @@ func (ctrl *OBClusterCtrl) OBServerScaleUPByZone(statefulApp cloudv1.StatefulApp
 	if err == nil {
 		clusterStatus = observerconst.ScaleUP
 		// add server
+		klog.Infoln("-----------------------OBServerScaleUPByZone-----------------------")
 		err = ctrl.AddOBServer(clusterIP, zoneName, podIP, statefulApp)
 		if err != nil {
 			return err
 		}
-		klog.Infoln("-----------------------OBServerScaleUPByZone-----------------------")
-		// 确认observer的状态是否ready并且start_service_time>0
-		go func() {
-			// TODO ：确认 pod 是 running，
-			err := ctrl.ReviseOBAgentConfig(podIP, clusterIP)
-			if err != nil {
-				klog.Errorln("OBServerScaleUPByZone : error revise obagent config (observer is active): ", err)
-			}
-		}()
-
 		zoneStatus = observerconst.OBServerAdd
 		// update status
 		return ctrl.UpdateOBClusterAndZoneStatus(clusterStatus, zoneName, zoneStatus)
@@ -143,15 +134,8 @@ func (ctrl *OBClusterCtrl) OBServerMaintain(statefulApp cloudv1.StatefulApp) err
 	// nil is need to add server
 	if err == nil {
 		// add server
-		err = ctrl.AddOBServer(clusterIP, zoneName, podIP, statefulApp)
 		klog.Infoln("-----------------------OBServerMaintain-----------------------")
-		go func() {
-			err := ctrl.ReviseOBAgentConfig(podIP, clusterIP)
-			if err != nil {
-				klog.Errorln("OBServerMaintain : error revise obagent config (observer is active): ", err)
-			}
-		}()
-		return err
+		return ctrl.AddOBServer(clusterIP, zoneName, podIP, statefulApp)
 	}
 
 	// get info for del server

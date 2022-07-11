@@ -96,9 +96,7 @@ func (ctrl *OBClusterCtrl) ReviseConfig(podIP string) error {
 func (ctrl *OBClusterCtrl) ReviseOBAgentConfig(podIP string, clusterIP string) error {
 	for {
 		obServerList := sql.GetOBServer(clusterIP)
-		klog.Infoln("ReviseOBAgentConfig: obServerList", obServerList)
 		for _, obServer := range obServerList {
-			klog.Infoln("ReviseOBAgentConfig: obServer ", obServer.SvrIP)
 			if obServer.SvrIP == podIP {
 				klog.Infoln("ReviseOBAgentConfig status and startServiceTime: ", obServer.SvrIP, obServer.Status, obServer.StartServiceTime)
 				if obServer.Status == "active" && obServer.StartServiceTime > 0 {

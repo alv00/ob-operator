@@ -49,6 +49,12 @@ func (ctrl *OBClusterCtrl) AddOBServer(clusterIP, zoneName, podIP string, statef
 		if zone.Name == zoneName && zone.ZoneStatus != observerconst.OBServerAdd {
 			// add server
 			go ctrl.AddOBServerExecuter(clusterIP, zoneName, podIP, statefulApp)
+
+			// add server and update obagent config
+			go func() {
+				ctrl.AddOBServerExecuter(clusterIP, zoneName, podIP, statefulApp)
+				ctrl.ReviseConfig(podIP)
+			}()
 			// update status
 			return ctrl.UpdateOBClusterAndZoneStatus(observerconst.ScaleUP, zoneName, observerconst.OBServerAdd)
 		}
