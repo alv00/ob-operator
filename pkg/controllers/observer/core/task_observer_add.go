@@ -93,7 +93,7 @@ func (ctrl *OBClusterCtrl) AddOBServerExecuter(clusterIP, zoneName, podIP string
 	// nil is OBServer is already running
 	if err != nil {
 		cable.OBServerStartExecuter(podIP, obServerStartArgs)
-		err = TickerOBServerStatusCheck(podIP)
+		err = TickerOBServerStatusCheck(clusterIP, podIP)
 		klog.Errorln("TickerOBServerStatusCheck: err - ", err)
 		if err != nil {
 			// kill pod
@@ -124,7 +124,7 @@ func (ctrl *OBClusterCtrl) AddOBServerExecuter(clusterIP, zoneName, podIP string
 	_ = ctrl.UpdateOBClusterAndZoneStatus(observerconst.ClusterReady, zoneName, observerconst.OBZoneReady)
 }
 
-func TickerOBServerStatusCheck(podIP string) error {
+func TickerOBServerStatusCheck(clusterIP string, podIP string) error {
 	tick := time.Tick(observerconst.TickPeriodForOBServerStatusCheck)
 	var num int
 	for {
@@ -134,7 +134,7 @@ func TickerOBServerStatusCheck(podIP string) error {
 				return errors.New("observer starting timeout")
 			}
 			num = num + 1
-			obServerList := sql.GetOBServer(podIP)
+			obServerList := sql.GetOBServer(clusterIP)
 			klog.Infoln("TickerOBServerStatusCheck: obServerList", obServerList)
 			serverIP := fmt.Sprintf("%s:%d", podIP, constant.OBSERVER_RPC_PORT)
 			klog.Infoln("TickerOBServerStatusCheck: serverIP", serverIP)
