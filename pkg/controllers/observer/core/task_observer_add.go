@@ -94,6 +94,7 @@ func (ctrl *OBClusterCtrl) AddOBServerExecuter(clusterIP, zoneName, podIP string
 	if err != nil {
 		cable.OBServerStartExecuter(podIP, obServerStartArgs)
 		err = TickerOBServerStatusCheck(podIP)
+		klog.Errorln("TickerOBServerStatusCheck: err - ", err)
 		if err != nil {
 			// kill pod
 			_ = ctrl.DelPodFromStatefulAppByIP(zoneName, podIP, statefulApp)
