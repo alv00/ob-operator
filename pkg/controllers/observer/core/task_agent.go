@@ -47,20 +47,6 @@ func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp)
 	return nil
 }
 
-func (ctrl *OBClusterCtrl) ReviseAllOBAgentConfig(statefulApp cloudv1.StatefulApp) error {
-	subsets := statefulApp.Status.Subsets
-	// 获得所有的 obagent
-	for subsetsIdx, _ := range subsets {
-		for _, pod := range subsets[subsetsIdx].Pods {
-			err := ctrl.ReviseConfig(pod.PodIP)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
 func (ctrl *OBClusterCtrl) ReviseConfig(podIP string) error {
 	config := ConfigsJson{
 		[]Configs{
@@ -91,20 +77,4 @@ func (ctrl *OBClusterCtrl) ReviseConfig(podIP string) error {
 		klog.Errorln("Get failed with error: ", resp.Status)
 	}
 	return nil
-}
-
-func (ctrl *OBClusterCtrl) ReviseOBAgentConfig(podIP string, clusterIP string) error {
-	for {
-		obServerList := sql.GetOBServer(clusterIP)
-		for _, obServer := range obServerList {
-			if obServer.SvrIP == podIP {
-				klog.Infoln("ReviseOBAgentConfig status and startServiceTime: ", obServer.SvrIP, obServer.Status, obServer.StartServiceTime)
-				if obServer.Status == "active" && obServer.StartServiceTime > 0 {
-					return ctrl.ReviseConfig(podIP)
-				}
-			} else {
-				continue
-			}
-		}
-	}
 }
