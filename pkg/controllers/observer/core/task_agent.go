@@ -78,3 +78,17 @@ func (ctrl *OBClusterCtrl) ReviseConfig(podIP string) error {
 	}
 	return nil
 }
+
+func (ctrl *OBClusterCtrl) ReviseAllOBAgentConfig(statefulApp cloudv1.StatefulApp) error {
+	subsets := statefulApp.Status.Subsets
+	// 获得所有的 obagent
+	for subsetsIdx, _ := range subsets {
+		for _, pod := range subsets[subsetsIdx].Pods {
+			err := ctrl.ReviseConfig(pod.PodIP)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
