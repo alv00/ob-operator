@@ -135,6 +135,7 @@ func (ctrl *OBClusterCtrl) OBServerMaintain(statefulApp cloudv1.StatefulApp) err
 	if err == nil {
 		// add server
 		klog.Infoln("-----------------------OBServerMaintain-----------------------")
+		klog.Info("need to add server")
 		return ctrl.AddOBServer(clusterIP, zoneName, podIP, statefulApp)
 	}
 
@@ -144,6 +145,7 @@ func (ctrl *OBClusterCtrl) OBServerMaintain(statefulApp cloudv1.StatefulApp) err
 	// nil need to del server
 	if err == nil {
 		// del server
+		klog.Info("need to delete server")
 		return ctrl.DelOBServer(clusterIP, zoneName, podIP)
 	}
 

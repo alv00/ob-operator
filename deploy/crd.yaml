@@ -82,6 +82,18 @@ spec:
                   properties:
                     cluster:
                       type: string
+                    parameters:
+                      items:
+                        properties:
+                          name:
+                            type: string
+                          value:
+                            type: string
+                        required:
+                        - name
+                        - value
+                        type: object
+                      type: array
                     zone:
                       items:
                         properties:
@@ -94,7 +106,6 @@ spec:
                           region:
                             type: string
                           replicas:
-                            format: int32
                             minimum: 1
                             type: integer
                         required:
@@ -105,6 +116,7 @@ spec:
                       type: array
                   required:
                   - cluster
+                  - parameters
                   - zone
                   type: object
                 type: array
@@ -135,10 +147,8 @@ spec:
                       items:
                         properties:
                           availableReplicas:
-                            format: int32
                             type: integer
                           expectedReplicas:
-                            format: int32
                             type: integer
                           name:
                             type: string
@@ -217,6 +227,18 @@ spec:
                   properties:
                     cluster:
                       type: string
+                    parameters:
+                      items:
+                        properties:
+                          name:
+                            type: string
+                          value:
+                            type: string
+                        required:
+                        - name
+                        - value
+                        type: object
+                      type: array
                     zone:
                       items:
                         properties:
@@ -229,7 +251,6 @@ spec:
                           region:
                             type: string
                           replicas:
-                            format: int32
                             minimum: 1
                             type: integer
                         required:
@@ -240,6 +261,7 @@ spec:
                       type: array
                   required:
                   - cluster
+                  - parameters
                   - zone
                   type: object
                 type: array
@@ -333,6 +355,18 @@ spec:
                   properties:
                     cluster:
                       type: string
+                    parameters:
+                      items:
+                        properties:
+                          name:
+                            type: string
+                          value:
+                            type: string
+                        required:
+                        - name
+                        - value
+                        type: object
+                      type: array
                     zone:
                       items:
                         properties:
@@ -345,7 +379,6 @@ spec:
                           region:
                             type: string
                           replicas:
-                            format: int32
                             minimum: 1
                             type: integer
                         required:
@@ -356,6 +389,7 @@ spec:
                       type: array
                   required:
                   - cluster
+                  - parameters
                   - zone
                   type: object
                 type: array
@@ -4481,7 +4515,6 @@ spec:
                     region:
                       type: string
                     replicas:
-                      format: int32
                       minimum: 1
                       type: integer
                   required:
@@ -4507,10 +4540,8 @@ spec:
                 items:
                   properties:
                     availableReplicas:
-                      format: int32
                       type: integer
                     expectedReplicas:
-                      format: int32
                       type: integer
                     name:
                       type: string
