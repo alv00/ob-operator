@@ -30,7 +30,7 @@ type Subset struct {
 	Region       string            `json:"region,omitempty"`
 	NodeSelector map[string]string `json:"nodeSelector"`
 	// +kubebuilder:validation:Minimum=1
-	Replicas int32 `json:"replicas"`
+	Replicas int `json:"replicas"`
 }
 
 type StorageTemplate struct {
