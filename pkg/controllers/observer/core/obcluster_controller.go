@@ -115,8 +115,6 @@ func (ctrl *OBClusterCtrl) OBClusterCoordinator() (ctrl.Result, error) {
 func (ctrl *OBClusterCtrl) OBClusterEffector(statefulApp cloudv1.StatefulApp) error {
 	var err error
 	obClusterStatus := ctrl.OBCluster.Status.Status
-	klog.Infoln("OBClusterEffector: ctrl.OBCluster ", ctrl.OBCluster)
-	klog.Infoln("OBClusterEffector: StatefulApp ", statefulApp)
 	switch obClusterStatus {
 	case observerconst.TopologyPrepareing:
 		// OBCluster is not ready

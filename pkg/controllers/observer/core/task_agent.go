@@ -47,15 +47,16 @@ func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp)
 	return nil
 }
 
-func (ctrl *OBClusterCtrl) ReviseConfig(podIP string) error {
+func (ctrl *OBClusterCtrl) ReviseConfig(podIP string, zoneName string) error {
+	obCluster := ctrl.OBCluster
 	config := ConfigsJson{
 		[]Configs{
 			{Key: "monagent.ob.monitor.user", Value: "ocp_monitor"},
 			{Key: "monagent.ob.monitor.password", Value: "root"},
 			{Key: "monagent.host.ip", Value: podIP},
-			{Key: "monagent.ob.cluster.name", Value: "ob-test"},
-			{Key: "monagent.ob.cluster.id", Value: "1"},
-			{Key: "monagent.ob.zone.name", Value: "zone1"}}}
+			{Key: "monagent.ob.cluster.name", Value: obCluster.ClusterName},
+			{Key: "monagent.ob.cluster.id", Value: string(obCluster.Spec.ClusterID)},
+			{Key: "monagent.ob.zone.name", Value: zoneName}}}
 	updateUrl := fmt.Sprintf("http://%s:%d%s", podIP, observerconst.MonagentPort, observerconst.MonagentUpdateUrl)
 	body, _ := json.Marshal(config)
 	resp, err := http.Post(updateUrl, "application/json", bytes.NewBuffer(body))
@@ -83,8 +84,9 @@ func (ctrl *OBClusterCtrl) ReviseAllOBAgentConfig(statefulApp cloudv1.StatefulAp
 	subsets := statefulApp.Status.Subsets
 	// 获得所有的 obagent
 	for subsetsIdx, _ := range subsets {
+		zoneName := subsets[subsetsIdx].Name
 		for _, pod := range subsets[subsetsIdx].Pods {
-			err := ctrl.ReviseConfig(pod.PodIP)
+			err := ctrl.ReviseConfig(pod.PodIP, zoneName)
 			if err != nil {
 				return err
 			}
