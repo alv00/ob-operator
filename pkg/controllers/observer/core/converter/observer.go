@@ -115,7 +115,6 @@ func GetInfoForDelServerByZone(clusterIP string, clusterSpec cloudv1.Cluster, st
 
 	nodeMap := GenerateNodeMapByOBServerList(obServerList)
 
-	klog.Info("GetInfoForDelServerByZone: nodeMap", nodeMap)
 	// judge witch ip need del
 	for _, subset := range statefulApp.Status.Subsets {
 		podListToDelete := getPodListToDeleteFromSubsetStatus(subset)
