@@ -14,6 +14,7 @@ package converter
 
 import (
 	"github.com/pkg/errors"
+	"k8s.io/klog/v2"
 
 	cloudv1 "github.com/oceanbase/ob-operator/apis/cloud/v1"
 	myconfig "github.com/oceanbase/ob-operator/pkg/config"
@@ -56,6 +57,7 @@ func IsOBServerDeleted(clusterIP, podIP string) bool {
 
 func IsPodNotInOBServerList(zoneName, ip string, nodeMap map[string][]cloudv1.OBNode) bool {
 	zoneIPList := nodeMap[zoneName]
+
 	if len(zoneIPList) > 0 {
 		for _, tmpIP := range zoneIPList {
 			if tmpIP.ServerIP == ip {
@@ -87,6 +89,7 @@ func GetInfoForAddServerByZone(clusterIP string, statefulApp cloudv1.StatefulApp
 
 	nodeMap := GenerateNodeMapByOBServerList(obServerList)
 
+	klog.Info("GetInfoForAddServerByZone: nodeMap", nodeMap)
 	// judge witch ip need add
 	for _, subset := range statefulApp.Status.Subsets {
 		for _, pod := range subset.Pods {
@@ -112,12 +115,13 @@ func GetInfoForDelServerByZone(clusterIP string, clusterSpec cloudv1.Cluster, st
 
 	nodeMap := GenerateNodeMapByOBServerList(obServerList)
 
+	klog.Info("GetInfoForDelServerByZone: nodeMap", nodeMap)
 	// judge witch ip need del
 	for _, subset := range statefulApp.Status.Subsets {
 		podListToDelete := getPodListToDeleteFromSubsetStatus(subset)
 		zoneSpec := GetZoneSpecFromClusterSpec(subset.Name, clusterSpec)
 		// number of observer in db > replica
-		if len(nodeMap[subset.Name]) > int(zoneSpec.Replicas) {
+		if len(nodeMap[subset.Name]) > zoneSpec.Replicas {
 			for _, pod := range nodeMap[subset.Name] {
 				for _, podToDelete := range podListToDelete {
 					if pod.ServerIP == podToDelete {
