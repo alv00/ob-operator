@@ -91,7 +91,9 @@ func (ctrl *OBClusterCtrl) AddOBServerExecuter(clusterIP, zoneName, podIP string
 	// nil is OBServer is already running
 	if err != nil {
 		cable.OBServerStartExecuter(podIP, obServerStartArgs)
-		err = TickerOBServerStatusCheck(clusterIP, podIP)
+		klog.Infoln("TickerOBServerStatusCheck: ", ctrl.OBCluster.Name, podIP)
+		err = TickerOBServerStatusCheck(ctrl.OBCluster.Name, podIP)
+		klog.Infoln("TickerOBServerStatusCheck: err ", err)
 		if err != nil {
 			// kill pod
 			_ = ctrl.DelPodFromStatefulAppByIP(zoneName, podIP, statefulApp)
@@ -107,6 +109,15 @@ func (ctrl *OBClusterCtrl) AddOBServerExecuter(clusterIP, zoneName, podIP string
 		klog.Infoln("sql.AddServer, DelPodFromStatefulAppByIP")
 		_ = ctrl.DelPodFromStatefulAppByIP(zoneName, podIP, statefulApp)
 		klog.Infoln("sql.AddServer, UpdateOBClusterAndZoneStatus")
+		_ = ctrl.UpdateOBClusterAndZoneStatus(observerconst.ClusterReady, zoneName, observerconst.OBZoneReady)
+	}
+
+	klog.Infoln("TickerOBServerStatusCheckFromDB: ", clusterIP, podIP)
+	err = TickerOBServerStatusCheckFromDB(clusterIP, podIP)
+	klog.Infoln("TickerOBServerStatusCheckFromDB: ", err)
+	if err != nil {
+		// kill pod
+		_ = ctrl.DelPodFromStatefulAppByIP(zoneName, podIP, statefulApp)
 		_ = ctrl.UpdateOBClusterAndZoneStatus(observerconst.ClusterReady, zoneName, observerconst.OBZoneReady)
 	}
 
@@ -127,7 +138,27 @@ func (ctrl *OBClusterCtrl) AddOBServerExecuter(clusterIP, zoneName, podIP string
 	_ = ctrl.UpdateOBClusterAndZoneStatus(observerconst.ClusterReady, zoneName, observerconst.OBZoneReady)
 }
 
-func TickerOBServerStatusCheck(clusterIP string, podIP string) error {
+func TickerOBServerStatusCheck(clusterName, podIP string) error {
+	tick := time.Tick(observerconst.TickPeriodForOBServerStatusCheck)
+	var num int
+	var err error
+	for {
+		select {
+		case <-tick:
+			if num > observerconst.TickNumForOBServerStatusCheck {
+				return errors.New("observer starting timeout")
+			}
+			num = num + 1
+			err = cable.OBServerStatusCheckExecuter(clusterName, podIP)
+			if err == nil {
+				return err
+			}
+		}
+	}
+
+}
+
+func TickerOBServerStatusCheckFromDB(clusterIP string, podIP string) error {
 	tick := time.Tick(observerconst.TickPeriodForOBServerStatusCheck)
 	var num int
 	for {
