@@ -91,9 +91,7 @@ func (ctrl *OBClusterCtrl) AddOBServerExecuter(clusterIP, zoneName, podIP string
 	// nil is OBServer is already running
 	if err != nil {
 		cable.OBServerStartExecuter(podIP, obServerStartArgs)
-		klog.Infoln("TickerOBServerStatusCheck: ", ctrl.OBCluster.Name, podIP)
 		err = TickerOBServerStatusCheck(ctrl.OBCluster.Name, podIP)
-		klog.Infoln("TickerOBServerStatusCheck: err ", err)
 		if err != nil {
 			// kill pod
 			_ = ctrl.DelPodFromStatefulAppByIP(zoneName, podIP, statefulApp)
@@ -102,19 +100,14 @@ func (ctrl *OBClusterCtrl) AddOBServerExecuter(clusterIP, zoneName, podIP string
 	}
 
 	// add server
-	klog.Infoln("sql.AddServer(clusterIP, zoneName, podIP)")
 	err = sql.AddServer(clusterIP, zoneName, podIP)
 	if err != nil {
 		// kill pod
-		klog.Infoln("sql.AddServer, DelPodFromStatefulAppByIP")
 		_ = ctrl.DelPodFromStatefulAppByIP(zoneName, podIP, statefulApp)
-		klog.Infoln("sql.AddServer, UpdateOBClusterAndZoneStatus")
 		_ = ctrl.UpdateOBClusterAndZoneStatus(observerconst.ClusterReady, zoneName, observerconst.OBZoneReady)
 	}
 
-	klog.Infoln("TickerOBServerStatusCheckFromDB: ", clusterIP, podIP)
 	err = TickerOBServerStatusCheckFromDB(clusterIP, podIP)
-	klog.Infoln("TickerOBServerStatusCheckFromDB: ", err)
 	if err != nil {
 		// kill pod
 		_ = ctrl.DelPodFromStatefulAppByIP(zoneName, podIP, statefulApp)
@@ -122,13 +115,10 @@ func (ctrl *OBClusterCtrl) AddOBServerExecuter(clusterIP, zoneName, podIP string
 	}
 
 	// update OBServer Pod Readiness
-	klog.Infoln("cable.CableReadinessUpdateExecuter")
 	err = cable.CableReadinessUpdateExecuter(podIP)
 	if err != nil {
 		// kill pod
-		klog.Infoln("CableReadinessUpdateExecuter, DelPodFromStatefulAppByIP")
 		_ = ctrl.DelPodFromStatefulAppByIP(zoneName, podIP, statefulApp)
-		klog.Infoln("CableReadinessUpdateExecuter, UpdateOBClusterAndZoneStatus")
 		_ = ctrl.UpdateOBClusterAndZoneStatus(observerconst.ClusterReady, zoneName, observerconst.OBZoneReady)
 	}
 
