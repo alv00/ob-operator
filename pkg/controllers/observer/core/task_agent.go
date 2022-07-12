@@ -57,7 +57,7 @@ func (ctrl *OBClusterCtrl) ReviseConfig(podIP string, zoneName string) error {
 			{Key: "monagent.ob.monitor.user", Value: "ocp_monitor"},
 			{Key: "monagent.ob.monitor.password", Value: "root"},
 			{Key: "monagent.host.ip", Value: podIP},
-			{Key: "monagent.ob.cluster.name", Value: obCluster.ClusterName},
+			{Key: "monagent.ob.cluster.name", Value: "ob-test"},
 			{Key: "monagent.ob.cluster.id", Value: string(obCluster.Spec.ClusterID)},
 			{Key: "monagent.ob.zone.name", Value: zoneName}}}
 	updateUrl := fmt.Sprintf("http://%s:%d%s", podIP, observerconst.MonagentPort, observerconst.MonagentUpdateUrl)
