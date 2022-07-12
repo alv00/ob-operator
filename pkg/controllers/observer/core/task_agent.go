@@ -49,6 +49,9 @@ func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp)
 
 func (ctrl *OBClusterCtrl) ReviseConfig(podIP string, zoneName string) error {
 	obCluster := ctrl.OBCluster
+	klog.Infoln("-----------------ReviseConfig-----------------")
+	klog.Infoln("obCluster: ", obCluster, "  podIP: ", podIP, "  clusterName: ", obCluster.ClusterName,
+		"  clusterId: ", obCluster.Spec.ClusterID, "  zoneName: ", zoneName)
 	config := ConfigsJson{
 		[]Configs{
 			{Key: "monagent.ob.monitor.user", Value: "ocp_monitor"},
