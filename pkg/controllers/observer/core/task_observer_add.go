@@ -159,10 +159,7 @@ func TickerOBServerStatusCheckFromDB(clusterIP string, podIP string) error {
 			}
 			num = num + 1
 			obServerList := sql.GetOBServer(clusterIP)
-			klog.Infoln("TickerOBServerStatusCheck: obServerList", obServerList)
 			for _, obServer := range obServerList {
-				klog.Infoln("TickerOBServerStatusCheck: obServer.SvrIP", obServer.SvrIP)
-				klog.Infoln("TickerOBServerStatusCheck: podIP", podIP)
 				if obServer.SvrIP == podIP {
 					if obServer.Status == observerconst.OBServerActive && obServer.StartServiceTime > 0 {
 						return nil

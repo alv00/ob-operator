@@ -51,10 +51,6 @@ func (ctrl *OBClusterCtrl) ReviseConfig(podIP string, zoneName string) error {
 	obCluster := ctrl.OBCluster
 	clusterName := obCluster.Name
 	clusterID := fmt.Sprintf("%d", obCluster.Spec.ClusterID)
-	klog.Infoln("-----------------ReviseConfig-----------------")
-	klog.Infoln("obCluster: ", obCluster)
-	klog.Infoln("podIP: ", podIP, "  clusterName: ", clusterName,
-		"  clusterId: ", clusterID, "  zoneName: ", zoneName)
 	config := ConfigsJson{
 		[]Configs{
 			{Key: "monagent.ob.monitor.user", Value: "ocp_monitor"},
@@ -65,7 +61,6 @@ func (ctrl *OBClusterCtrl) ReviseConfig(podIP string, zoneName string) error {
 			{Key: "monagent.ob.zone.name", Value: zoneName}}}
 	updateUrl := fmt.Sprintf("http://%s:%d%s", podIP, observerconst.MonagentPort, observerconst.MonagentUpdateUrl)
 	body, _ := json.Marshal(config)
-	klog.Infoln("config: ", config)
 	resp, err := http.Post(updateUrl, "application/json", bytes.NewBuffer(body))
 	if err != nil {
 		klog.Errorln("update obagent config failed,", podIP, err)
