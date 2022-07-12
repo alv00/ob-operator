@@ -38,3 +38,13 @@ type RSJobStatus struct {
 	ReturnCode int64
 	Progress   int64
 }
+
+type SysParameterStat struct {
+	Zone      string
+	SvrIP     string
+	SvrPort   int64
+	Name      string
+	Value     string
+	Scope     string
+	EditLevel string
+}
