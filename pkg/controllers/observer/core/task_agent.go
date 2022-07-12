@@ -50,18 +50,19 @@ func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp)
 func (ctrl *OBClusterCtrl) ReviseConfig(podIP string, zoneName string) error {
 	obCluster := ctrl.OBCluster
 	klog.Infoln("-----------------ReviseConfig-----------------")
-	klog.Infoln("obCluster: ", obCluster, "  podIP: ", podIP, "  clusterName: ", obCluster.ClusterName,
+	klog.Infoln("obCluster: ", obCluster, "  podIP: ", podIP, "  clusterName: ", obCluster.GetClusterName(),
 		"  clusterId: ", obCluster.Spec.ClusterID, "  zoneName: ", zoneName)
 	config := ConfigsJson{
 		[]Configs{
 			{Key: "monagent.ob.monitor.user", Value: "ocp_monitor"},
 			{Key: "monagent.ob.monitor.password", Value: "root"},
 			{Key: "monagent.host.ip", Value: podIP},
-			{Key: "monagent.ob.cluster.name", Value: "ob-test"},
+			{Key: "monagent.ob.cluster.name", Value: obCluster.GetClusterName()},
 			{Key: "monagent.ob.cluster.id", Value: string(obCluster.Spec.ClusterID)},
 			{Key: "monagent.ob.zone.name", Value: zoneName}}}
 	updateUrl := fmt.Sprintf("http://%s:%d%s", podIP, observerconst.MonagentPort, observerconst.MonagentUpdateUrl)
 	body, _ := json.Marshal(config)
+	klog.Infoln("config: ", config)
 	resp, err := http.Post(updateUrl, "application/json", bytes.NewBuffer(body))
 	if err != nil {
 		klog.Errorln("update obagent config failed,", podIP, err)
