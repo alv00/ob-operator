@@ -14,9 +14,9 @@ package converter
 
 import (
 	"fmt"
-
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/klog/v2"
 
 	cloudv1 "github.com/oceanbase/ob-operator/apis/cloud/v1"
 	observerconst "github.com/oceanbase/ob-operator/pkg/controllers/observer/const"
@@ -43,7 +43,7 @@ func GenerateObContainer(obClusterSpec cloudv1.OBClusterSpec) corev1.Container {
 	port := make([]corev1.ContainerPort, 0)
 	cablePort := corev1.ContainerPort{}
 	cablePort.Name = observerconst.CablePortName
-	cablePort.ContainerPort = int32(observerconst.CablePort)
+	cablePort.ContainerPort = observerconst.CablePort
 	cablePort.Protocol = corev1.ProtocolTCP
 	port = append(port, cablePort)
 	mysqlPort := corev1.ContainerPort{}
@@ -119,6 +119,7 @@ func GenerateObagentContainer(obClusterSpec cloudv1.OBClusterSpec) corev1.Contai
 		Requests: requestsResources,
 		Limits:   limitResources,
 	}
+	klog.Info("Resources :", resources)
 
 	volumeMountConfFile := corev1.VolumeMount{}
 	volumeMountConfFile.Name = observerconst.ConfFileStorageName
@@ -171,10 +172,17 @@ func GeneratePodSpec(obClusterSpec cloudv1.OBClusterSpec) corev1.PodSpec {
 		ClaimName: observerconst.LogStorageName,
 	}
 	volumeLog.VolumeSource.PersistentVolumeClaim = volumeLogSource
+	volumeObagentConfFile := corev1.Volume{}
+	volumeObagentConfFile.Name = observerconst.ConfFileStorageName
+	volumeObagentConfFileSource := &corev1.PersistentVolumeClaimVolumeSource{
+		ClaimName: observerconst.ConfFileStorageName,
+	}
+	volumeObagentConfFile.VolumeSource.PersistentVolumeClaim = volumeObagentConfFileSource
 	volumes := make([]corev1.Volume, 0)
 	volumes = append(volumes, volumeDataFile)
 	volumes = append(volumes, volumeDataLog)
 	volumes = append(volumes, volumeLog)
+	volumes = append(volumes, volumeObagentConfFile)
 
 	podSpec := corev1.PodSpec{
 		Containers: containers,
