@@ -396,11 +396,7 @@ spec:
         - --cluster-name=cn
         command:
         - /manager
-<<<<<<< HEAD
-        image: alv00/ob-operator:0.72
-=======
-        image: oceanbasedev/ob-operator:1.0.16
->>>>>>> 4c16da9227fe3844de43823c6916a380c63bbfc1
+        image: oceanbasedev/ob-operator:1.0.18
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
