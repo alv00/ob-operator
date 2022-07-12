@@ -13,8 +13,6 @@ See the Mulan PSL v2 for more details.
 package core
 
 import (
-	"fmt"
-	"github.com/oceanbase/ob-operator/pkg/config/constant"
 	"time"
 
 	"github.com/pkg/errors"
@@ -92,16 +90,11 @@ func (ctrl *OBClusterCtrl) AddOBServerExecuter(clusterIP, zoneName, podIP string
 	err = cable.OBServerStatusCheckExecuter(ctrl.OBCluster.Name, podIP)
 	// nil is OBServer is already running
 	if err != nil {
-		klog.Infoln("cable.OBServerStartExecuter")
 		cable.OBServerStartExecuter(podIP, obServerStartArgs)
-		klog.Infoln("TickerOBServerStatusCheck")
 		err = TickerOBServerStatusCheck(clusterIP, podIP)
-		klog.Errorln("TickerOBServerStatusCheck: err - ", err)
 		if err != nil {
 			// kill pod
-			klog.Infoln("DelPodFromStatefulAppByIP")
 			_ = ctrl.DelPodFromStatefulAppByIP(zoneName, podIP, statefulApp)
-			klog.Infoln("UpdateOBClusterAndZoneStatus")
 			_ = ctrl.UpdateOBClusterAndZoneStatus(observerconst.ClusterReady, zoneName, observerconst.OBZoneReady)
 		}
 	}
@@ -145,12 +138,10 @@ func TickerOBServerStatusCheck(clusterIP string, podIP string) error {
 			}
 			num = num + 1
 			obServerList := sql.GetOBServer(clusterIP)
-			klog.Infoln("TickerOBServerStatusCheck: obServerList", obServerList)
-			serverIP := fmt.Sprintf("%s:%d", podIP, constant.OBSERVER_RPC_PORT)
-			klog.Infoln("TickerOBServerStatusCheck: serverIP", serverIP)
 			for _, obServer := range obServerList {
 				klog.Infoln("TickerOBServerStatusCheck: obServer.SvrIP", obServer.SvrIP)
-				if obServer.SvrIP == serverIP {
+				klog.Infoln("TickerOBServerStatusCheck: podIP", podIP)
+				if obServer.SvrIP == podIP {
 					if obServer.Status == observerconst.OBServerActive && obServer.StartServiceTime > 0 {
 						return nil
 					}
