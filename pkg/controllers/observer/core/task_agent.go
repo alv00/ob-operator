@@ -49,8 +49,8 @@ func (ctrl *OBClusterCtrl) CreateUserForObagent(statefulApp cloudv1.StatefulApp)
 
 func (ctrl *OBClusterCtrl) ReviseConfig(podIP string, zoneName string) error {
 	obCluster := ctrl.OBCluster
-	clusterName := obCluster.ClusterName
-	clusterID := string(obCluster.Spec.ClusterID)
+	clusterName := obCluster.Name
+	clusterID := fmt.Sprintf("%d", obCluster.Spec.ClusterID)
 	klog.Infoln("-----------------ReviseConfig-----------------")
 	klog.Infoln("obCluster: ", obCluster)
 	klog.Infoln("podIP: ", podIP, "  clusterName: ", clusterName,
