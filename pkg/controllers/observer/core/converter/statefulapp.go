@@ -16,7 +16,6 @@ import (
 	"fmt"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"k8s.io/klog/v2"
 
 	cloudv1 "github.com/oceanbase/ob-operator/apis/cloud/v1"
 	observerconst "github.com/oceanbase/ob-operator/pkg/controllers/observer/const"
@@ -109,18 +108,6 @@ func GenerateObagentContainer(obClusterSpec cloudv1.OBClusterSpec) corev1.Contai
 	monagentPort.Protocol = corev1.ProtocolTCP
 	ports = append(ports, monagentPort)
 
-	requestsResources := corev1.ResourceList{}
-	requestsResources["cpu"] = obClusterSpec.Resources.CPU
-	requestsResources["memory"] = obClusterSpec.Resources.Memory
-	limitResources := corev1.ResourceList{}
-	limitResources["cpu"] = obClusterSpec.Resources.CPU
-	limitResources["memory"] = obClusterSpec.Resources.Memory
-	resources := corev1.ResourceRequirements{
-		Requests: requestsResources,
-		Limits:   limitResources,
-	}
-	klog.Info("Resources :", resources)
-
 	volumeMountConfFile := corev1.VolumeMount{}
 	volumeMountConfFile.Name = observerconst.ConfFileStorageName
 	volumeMountConfFile.MountPath = observerconst.ConfFileStoragePath
@@ -138,7 +125,6 @@ func GenerateObagentContainer(obClusterSpec cloudv1.OBClusterSpec) corev1.Contai
 		Image:           obClusterSpec.ImageObagent,
 		ImagePullPolicy: observerconst.ImgPullPolicy,
 		Ports:           ports,
-		Resources:       resources,
 		VolumeMounts:    volumeMounts,
 		ReadinessProbe:  &readinessProbe,
 	}

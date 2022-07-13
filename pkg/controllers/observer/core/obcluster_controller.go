@@ -118,15 +118,12 @@ func (ctrl *OBClusterCtrl) OBClusterEffector(statefulApp cloudv1.StatefulApp) er
 	switch obClusterStatus {
 	case observerconst.TopologyPrepareing:
 		// OBCluster is not ready
-		klog.Info("obcluster is preparing")
 		err = ctrl.TopologyPrepareingEffector(statefulApp)
 	case observerconst.TopologyNotReady:
 		// OBCluster is not ready
-		klog.Info("obcluster is not ready")
 		err = ctrl.TopologyNotReadyEffector(statefulApp)
 	case observerconst.TopologyReady:
 		// OBCluster is ready
-		klog.Info("obcluster is ready")
 		err = ctrl.TopologyReadyEffector(statefulApp)
 	}
 	return err
@@ -190,7 +187,6 @@ func (ctrl *OBClusterCtrl) TopologyNotReadyEffector(statefulApp cloudv1.Stateful
 
 func (ctrl *OBClusterCtrl) TopologyReadyEffector(statefulApp cloudv1.StatefulApp) error {
 	// check parameter and version in obcluster, set parameter when modified
-	klog.Info("obcluster ready effector")
 	ctrl.CheckAndSetParameters()
 
 	// check version update
